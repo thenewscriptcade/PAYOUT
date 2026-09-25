@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARD//MARKET: MEGA UPDATE</title>
+    <title>CARD//MARKET: MASSIVE EXPANSION v2.2 - 60+ UNIQUE CARDS</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -18,15 +18,14 @@
                         bg: '#f0f0f0',
                         panel: '#ffffff',
                         border: '#000000',
-                        accent: '#ffcc00', // Yellow
-                        accentRed: '#ff3333', // Red
-                        accentCyan: '#00f0ff', // Cyan
-                        accentPurple: '#cc33ff', // Purple
-                        accentGreen: '#00ff66', // Toxic Green
+                        accent: '#ffcc00', 
+                        accentRed: '#ff3333', 
+                        accentCyan: '#00f0ff', 
+                        accentPurple: '#cc33ff', 
+                        accentGreen: '#00ff66', 
                         textMain: '#000000',
                         textMuted: '#666666',
                         
-                        // Rarities
                         common: '#a0a0a0',
                         uncommon: '#00cc66',
                         rare: '#3366ff',
@@ -45,6 +44,7 @@
                         'brutal-lg': '10px 10px 0px 0px rgba(0,0,0,1)',
                         'brutal-cyan': '6px 6px 0px 0px #00f0ff',
                         'brutal-purple': '6px 6px 0px 0px #cc33ff',
+                        'brutal-green': '6px 6px 0px 0px #00ff66',
                     }
                 }
             }
@@ -66,32 +66,33 @@
         ::-webkit-scrollbar-thumb { background: #000; border: 2px solid #fff; }
 
         .font-black-custom { font-weight: 900; letter-spacing: -0.05em; }
-        .text-outline { -webkit-text-stroke: 1.5px black; color: white; }
 
         @keyframes marquee {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-4px, 2px) rotate(-3deg); }
-            40% { transform: translate(4px, -2px) rotate(3deg); }
-            60% { transform: translate(-3px, -2px) rotate(-2deg); }
-            80% { transform: translate(3px, 2px) rotate(2deg); }
         }
         @keyframes holo-shine {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 6px 6px 0px #000; }
-            50% { box-shadow: 6px 6px 0px #00f0ff; }
+        @keyframes flash-green {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(0, 255, 102, 0.3); }
+        }
+        @keyframes flash-red {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(255, 51, 51, 0.3); }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .animate-marquee { animation: marquee 25s linear infinite; }
-        .animate-shake { animation: shake 0.25s ease-in-out infinite; }
-        .animate-glow { animation: pulse-glow 2s infinite; }
+        .animate-marquee { animation: marquee 35s linear infinite; }
+        .price-up { animation: flash-green 0.8s ease; }
+        .price-down { animation: flash-red 0.8s ease; }
+        .spin-anim { animation: spin 2s linear infinite; }
 
         .brutal-border { border: 3px solid #000; }
         
@@ -113,15 +114,21 @@
             user-select: none;
         }
         
-        .brutal-btn:hover {
+        .brutal-btn:hover:not(:disabled) {
             transform: translate(-2px, -2px);
             box-shadow: 6px 6px 0px 0px #000;
             background-color: theme('colors.accent');
         }
         
-        .brutal-btn:active {
+        .brutal-btn:active:not(:disabled) {
             transform: translate(2px, 2px);
             box-shadow: 2px 2px 0px 0px #000;
+        }
+
+        .brutal-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #ccc;
         }
 
         .brutal-input {
@@ -148,19 +155,20 @@
             display: flex;
             flex-direction: column;
             cursor: pointer;
+            user-select: none;
         }
         
         .trading-card:hover {
-            transform: translate(-4px, -4px);
+            transform: translate(-4px, -4px) scale(1.02);
             box-shadow: 10px 10px 0px #000;
             z-index: 10;
         }
 
-        /* Foil / Holographic Card Animation */
         .trading-card.is-foil {
             border-color: #000;
             box-shadow: 6px 6px 0px #00f0ff;
         }
+        
         .trading-card.is-foil::before {
             content: '';
             position: absolute;
@@ -181,6 +189,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            overflow: hidden;
         }
 
         .holo-overlay {
@@ -209,73 +218,69 @@
 
         #notification-container { z-index: 9999; pointer-events: none; }
         .toast { transition: all 0.2s ease; pointer-events: auto; }
+        
+        .spinner-card {
+            width: 140px;
+            height: 200px;
+            margin: 0 4px;
+            flex-shrink: 0;
+            transform: scale(0.9);
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+        .spinner-card.winner {
+            transform: scale(1);
+            opacity: 1;
+            box-shadow: 0 0 20px theme('colors.accentGreen');
+            border-color: theme('colors.accentGreen');
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen w-screen text-base select-none">
 
     <div class="bg-black text-white py-1.5 px-4 brutal-border border-t-0 border-l-0 border-r-0 flex items-center gap-4 text-xs font-bold uppercase overflow-hidden shrink-0 z-50">
-        <span class="bg-accentRed text-white px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom animate-pulse">LIVE MARKET</span>
+        <span class="bg-accentRed text-white px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom animate-pulse">EXPANSION v2.2 LIVE</span>
         <div class="overflow-hidden w-full relative">
             <div id="ticker-marquee" class="animate-marquee whitespace-nowrap inline-block">
-                <span>CARD INDEX: VOID KNIGHT ▲ +18.4%</span> &nbsp;&nbsp;///&nbsp;&nbsp;
-                <span>MECHA LEVIATHAN ▲ +12.1%</span> &nbsp;&nbsp;///&nbsp;&nbsp;
-                <span>FOIL CARDS YIELD 2.5X PASSIVE REV</span> &nbsp;&nbsp;///&nbsp;&nbsp;
-                <span>NEBULA DRAGON ▲ +24.0%</span> &nbsp;&nbsp;///&nbsp;&nbsp;
-                <span>AUCTION HOUSE: LIVE BIDDING READY</span> &nbsp;&nbsp;///&nbsp;&nbsp;
-                <span>OMEGA FRAME ▲ +31.8%</span>
+                <span>OVER 60+ UNIQUE CARDS ADDED TO THE MARKETPLACE... DISCOVER NEW CYBERPUNK, VOID HORROR & MECHA SETS NOW!</span>
             </div>
+        </div>
+        <div id="connection-status-badge" class="bg-accentGreen text-black px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom text-[10px]">
+            ONLINE
         </div>
     </div>
 
     <header class="h-20 bg-white brutal-border border-t-0 flex items-center justify-between px-6 z-50 shrink-0 relative">
         <div class="flex items-center gap-3">
             <h1 class="font-black-custom text-3xl tracking-tighter bg-accent px-3 py-1 brutal-border shadow-brutal-sm inline-block transform -rotate-2">
-                CARD//MARKET <span class="bg-black text-white text-xs px-1.5 py-0.5 ml-1">v2.0</span>
+                CARD//MARKET <span class="bg-black text-white text-xs px-1.5 py-0.5 ml-1">v2.2 EXPANDED</span>
             </h1>
         </div>
         
-        <!-- Live Global Search Input -->
-        <div class="flex-1 max-w-md mx-4 flex gap-4">
+        <div class="flex-1 max-w-md mx-4 flex gap-4 hidden md:flex">
             <div class="flex-1 brutal-border bg-white flex items-center px-3 shadow-brutal-sm">
                 <i class="ph ph-magnifying-glass font-bold text-xl mr-2"></i>
-                <input id="global-search-input" type="text" placeholder="GLOBAL SEARCH (CARDS, SETS, AUCTIONS)..." class="w-full font-bold focus:outline-none uppercase bg-transparent text-xs placeholder-black/50 py-2">
+                <input id="global-search-input" type="text" placeholder="SEARCH 60+ CARDS & CATEGORIES..." class="w-full font-bold focus:outline-none uppercase bg-transparent text-xs placeholder-black/50 py-2">
             </div>
         </div>
 
         <div class="flex items-center gap-5 font-bold">
-            <!-- Audio Toggle Button -->
-            <button id="btn-audio-toggle" class="brutal-btn px-3 py-1.5 bg-white flex items-center gap-2 text-xs uppercase">
-                <i class="ph ph-speaker-high text-lg" id="audio-icon"></i>
-                <span id="audio-label">AUDIO ON</span>
-            </button>
-
-            <!-- Save / Load Options -->
-            <button id="btn-open-save-modal" class="brutal-btn px-3 py-1.5 bg-white flex items-center gap-1.5 text-xs uppercase">
-                <i class="ph ph-floppy-disk text-lg"></i> SAVE
-            </button>
-
-            <!-- Balance & Passive Rev Display -->
             <div class="flex flex-col items-end relative">
                 <div class="text-[10px] font-black-custom uppercase tracking-widest border-b-2 border-black mb-0.5">BALANCE</div>
                 <div class="font-black-custom text-xl" id="ui-balance">$0.00</div>
             </div>
             
-            <div class="h-8 w-1 bg-black"></div>
+            <div class="h-8 w-1 bg-black hidden sm:block"></div>
             
-            <div class="flex flex-col items-start">
-                <div class="text-[10px] font-black-custom uppercase tracking-widest border-b-2 border-black mb-0.5">PASSIVE REV</div>
+            <div class="flex flex-col items-start hidden sm:flex">
+                <div class="text-[10px] font-black-custom uppercase tracking-widest border-b-2 border-black mb-0.5">PASSIVE YIELD</div>
                 <div class="font-black-custom text-sm text-uncommon bg-black px-2 py-0.5 border border-black">+<span id="ui-income">0.00</span>/s</div>
             </div>
 
-            <!-- Overclock / Prestige Crystals Display -->
             <div class="flex flex-col items-start">
                 <div class="text-[10px] font-black-custom uppercase tracking-widest border-b-2 border-black mb-0.5 text-accentPurple">CRYSTALS</div>
                 <div class="font-black-custom text-sm text-white bg-accentPurple px-2 py-0.5 border border-black shadow-brutal-sm" id="ui-crystals">0 💎</div>
             </div>
-
-            <button id="btn-claim-vault" class="brutal-btn px-3 py-1.5 bg-accent text-black font-black-custom flex items-center gap-1.5 text-xs">
-                <i class="ph ph-vault text-lg"></i> CLAIM YIELD
-            </button>
         </div>
     </header>
 
@@ -284,76 +289,66 @@
         <aside class="w-64 bg-white brutal-border border-t-0 border-l-0 flex flex-col z-20 h-full shrink-0 shadow-[4px_0_0_rgba(0,0,0,1)] relative">
             <div class="p-3 brutal-border border-l-0 border-r-0 border-t-0 bg-gray-100 flex items-center gap-3">
                 <div class="w-10 h-10 bg-accent brutal-border shadow-brutal-sm flex items-center justify-center text-xl font-bold" id="ui-avatar">
-                    <i class="ph ph-user"></i>
+                    <i class="ph ph-user-gear"></i>
                 </div>
-                <div>
-                    <div class="font-black-custom text-base uppercase tracking-tighter" id="ui-player-name">TRADER_01</div>
-                    <div class="text-[10px] font-bold bg-black text-white px-2 py-0.5 inline-block">LVL <span id="ui-player-level">1</span> MOGUL</div>
+                <div class="overflow-hidden">
+                    <div class="font-black-custom text-sm uppercase tracking-tighter truncate" id="ui-player-name">TRADER_01</div>
+                    <div class="text-[9px] font-bold bg-black text-white px-2 py-0.5 inline-block">LVL <span id="ui-player-level">1</span> MOGUL</div>
                 </div>
             </div>
 
-            <nav class="flex-1 overflow-y-auto flex flex-col p-2.5 gap-2 bg-white/90">
+            <nav class="flex-1 overflow-y-auto flex flex-col p-2.5 gap-2 bg-white/90 pb-10">
                 <button class="nav-item brutal-btn active flex items-center gap-3 px-3.5 py-2 text-xs text-left" data-target="screen-dashboard">
                     <i class="ph ph-squares-four text-lg"></i> <span>DASHBOARD</span>
                 </button>
-                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left relative" data-target="screen-crates">
+                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left bg-accentGreen/20" data-target="screen-market">
+                    <i class="ph ph-chart-line-up text-lg text-green-700"></i> <span>OPEN MARKET</span>
+                    <span class="ml-auto bg-accentGreen text-black text-[9px] font-black-custom px-1.5 border border-black">LIVE</span>
+                </button>
+                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left" data-target="screen-crates">
                     <i class="ph ph-package text-lg"></i> <span>SUPPLY DEPOT</span>
-                    <span id="ui-free-crates-badge" class="absolute -top-1.5 -right-1.5 bg-accentRed text-white border-2 border-black font-black-custom px-1.5 py-0.2 shadow-brutal-sm text-[10px] hidden">0</span>
                 </button>
                 <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left" data-target="screen-collection">
-                    <i class="ph ph-cards text-lg"></i> <span>CARDDEX & UPGRADES</span>
+                    <i class="ph ph-cards text-lg"></i> <span>CARDDEX Database</span>
                 </button>
                 <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left bg-accentCyan/30" data-target="screen-forge">
-                    <i class="ph ph-fire text-lg text-accentRed"></i> <span>THE FORGE / CRAFT</span>
+                    <i class="ph ph-fire text-lg text-accentRed"></i> <span>THE FORGE</span>
                 </button>
                 <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left bg-accentRed/20" data-target="screen-arena">
                     <i class="ph ph-sword text-lg text-accentRed"></i> <span>BATTLE ARENA</span>
                 </button>
-                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left relative" data-target="screen-trades">
-                    <i class="ph ph-arrows-left-right text-lg"></i> <span>EXCHANGE</span>
-                    <span id="ui-trades-badge" class="absolute -top-1.5 -right-1.5 bg-accentRed text-white border-2 border-black font-black-custom px-1.5 py-0.2 shadow-brutal-sm text-[10px] hidden">0</span>
-                </button>
                 <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left relative" data-target="screen-auction">
                     <i class="ph ph-gavel text-lg text-accentPurple"></i> <span>LIVE AUCTION</span>
-                    <span id="auction-badge" class="absolute -top-1.5 -right-1.5 bg-accentPurple text-white border-2 border-black font-black-custom px-1.5 py-0.2 shadow-brutal-sm text-[10px]">LIVE</span>
-                </button>
-                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left" data-target="screen-market">
-                    <i class="ph ph-chart-line-up text-lg"></i> <span>OPEN MARKET</span>
-                </button>
-                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left" data-target="screen-sets">
-                    <i class="ph ph-intersect text-lg"></i> <span>SETS & BONUSES</span>
-                </button>
-                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left" data-target="screen-quests">
-                    <i class="ph ph-scroll text-lg"></i> <span>DIRECTIVES & BADGES</span>
+                    <span class="absolute -top-1.5 -right-1.5 bg-accentPurple text-white border-2 border-black font-black-custom px-1.5 shadow-brutal-sm text-[10px]">LIVE</span>
                 </button>
                 <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left" data-target="screen-leaderboard">
-                    <i class="ph ph-trophy text-lg"></i> <span>RANKINGS & PRESTIGE</span>
+                    <i class="ph ph-trophy text-lg"></i> <span>GLOBAL RANKINGS</span>
                 </button>
             </nav>
-
-            <!-- Quick Daily Reward Wheel Button -->
-            <div class="p-2.5 border-t-3 border-black bg-accent text-center">
-                <button id="btn-daily-bonus" class="brutal-btn w-full py-2 bg-black text-white text-xs hover:bg-accentRed relative">
-                    <i class="ph ph-gift mr-1"></i> CLAIM DAILY BONUS
-                    <span id="daily-timer" class="block text-[10px] text-gray-400 mt-1 hidden"></span>
-                </button>
-            </div>
         </aside>
 
-        <main class="flex-1 flex flex-col h-full relative z-10 p-6 overflow-y-auto">
+        <main class="flex-1 flex flex-col h-full relative z-10 p-4 sm:p-6 overflow-y-auto">
             
-            <!-- Dashboard Screen -->
+            <!-- Dashboard -->
             <div id="screen-dashboard" class="screen-content h-full flex flex-col gap-6">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between flex-wrap gap-4">
                     <div class="flex items-center relative">
-                        <div class="w-24 h-24 rounded-full bg-accentRed brutal-border shadow-brutal absolute -left-4 -top-6 z-0"></div>
-                        <h2 class="bg-accentRed text-white font-black-custom text-3xl p-3 brutal-border shadow-brutal z-10 relative inline-block uppercase tracking-tighter transform -rotate-1">
-                            OVERVIEW & MARKET TRENDS
+                        <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-accentRed brutal-border shadow-brutal absolute -left-2 -top-4 sm:-left-4 sm:-top-6 z-0"></div>
+                        <h2 class="bg-accentRed text-white font-black-custom text-xl sm:text-3xl p-2 sm:p-3 brutal-border shadow-brutal z-10 relative inline-block uppercase tracking-tighter transform -rotate-1">
+                            DASHBOARD & MARKET METRICS
                         </h2>
                     </div>
 
-                    <!-- Level Progress Bar -->
-                    <div class="brutal-box p-3 bg-white flex flex-col gap-1 w-64">
+                    <div class="flex items-center gap-3 relative z-10">
+                        <button id="btn-daily-bonus" class="brutal-btn px-3 py-2 text-xs flex items-center gap-2 bg-accentCyan">
+                            <i id="spin-icon" class="ph ph-spinner-gap text-lg"></i> <span id="daily-spin-text">DAILY SPIN</span>
+                        </button>
+                        <button id="btn-claim-vault" class="brutal-btn px-3 py-2 text-xs bg-accent flex items-center gap-2">
+                            <i class="ph ph-vault text-lg"></i> CLAIM VAULT
+                        </button>
+                    </div>
+
+                    <div class="brutal-box p-3 bg-white flex flex-col gap-1 w-full sm:w-64">
                         <div class="flex justify-between text-xs font-black-custom">
                             <span>MOGUL XP:</span>
                             <span id="ui-xp-text">0 / 500</span>
@@ -364,1151 +359,1445 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-10">
-                    <div class="brutal-box p-4 flex flex-col gap-1">
-                        <div class="font-bold border-b-3 border-black pb-1 text-sm flex justify-between">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
+                    <div class="brutal-box p-4 flex flex-col gap-1 bg-white">
+                        <div class="font-bold border-b-3 border-black pb-1 text-[10px] sm:text-sm flex justify-between">
                             <span>NET WORTH</span>
-                            <i class="ph ph-trend-up text-lg text-uncommon"></i>
+                            <i class="ph ph-trend-up text-lg text-uncommon hidden sm:block"></i>
                         </div>
-                        <div class="font-black-custom text-3xl mt-1" id="dash-col-value">$0.00</div>
+                        <div class="font-black-custom text-xl sm:text-3xl mt-1" id="dash-col-value">$0.00</div>
                     </div>
                     <div class="brutal-box p-4 flex flex-col gap-1 bg-accent">
-                        <div class="font-bold border-b-3 border-black pb-1 text-sm flex justify-between">
-                            <span>UNIQUE DISCOVERIES</span>
-                            <i class="ph ph-cards text-lg"></i>
+                        <div class="font-bold border-b-3 border-black pb-1 text-[10px] sm:text-sm flex justify-between">
+                            <span>CARDDEX COLLECTION</span>
+                            <i class="ph ph-cards text-lg hidden sm:block"></i>
                         </div>
-                        <div class="font-black-custom text-3xl mt-1" id="dash-unique">0 / 80</div>
+                        <div class="font-black-custom text-xl sm:text-3xl mt-1" id="dash-unique">0</div>
                     </div>
-                    <div class="brutal-box p-4 flex flex-col gap-1">
-                        <div class="font-bold border-b-3 border-black pb-1 text-sm flex justify-between">
-                            <span>COMPLETED TRADES</span>
-                            <i class="ph ph-handshake text-lg"></i>
+                    <div class="brutal-box p-4 flex flex-col gap-1 bg-white">
+                        <div class="font-bold border-b-3 border-black pb-1 text-[10px] sm:text-sm flex justify-between">
+                            <span>NETWORK TRADERS</span>
+                            <i class="ph ph-users text-lg hidden sm:block"></i>
                         </div>
-                        <div class="font-black-custom text-3xl mt-1" id="dash-trades">0</div>
+                        <div class="font-black-custom text-xl sm:text-3xl mt-1" id="dash-bots-count">0</div>
                     </div>
                     <div class="brutal-box p-4 flex flex-col gap-1 bg-accentCyan">
-                        <div class="font-bold border-b-3 border-black pb-1 text-sm flex justify-between">
+                        <div class="font-bold border-b-3 border-black pb-1 text-[10px] sm:text-sm flex justify-between">
                             <span>ARENA WINS</span>
-                            <i class="ph ph-trophy text-lg"></i>
+                            <i class="ph ph-trophy text-lg hidden sm:block"></i>
                         </div>
-                        <div class="font-black-custom text-3xl mt-1" id="dash-arena-wins">0</div>
+                        <div class="font-black-custom text-xl sm:text-3xl mt-1" id="dash-arena-wins">0</div>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0 relative z-10">
-                    <!-- Recent Acquisitions -->
-                    <div class="brutal-box p-4 flex flex-col bg-white/95">
-                        <h3 class="font-black-custom text-lg mb-3 border-b-4 border-black pb-1 uppercase flex justify-between items-center">
-                            <span>RECENT ACQUISITIONS</span>
-                            <i class="ph ph-clock-counter-clockwise"></i>
-                        </h3>
-                        <div class="flex-1 overflow-y-auto grid grid-cols-2 gap-2 p-1" id="dash-recent-grid">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
-
-                    <!-- Active NPC Offers -->
                     <div class="brutal-box p-0 flex flex-col bg-white">
                         <h3 class="font-black-custom text-lg p-3 border-b-4 border-black bg-black text-white uppercase flex justify-between items-center">
-                            <span>ACTIVE EXCHANGE OFFERS</span>
-                            <span class="bg-accentRed px-2 py-0.5 text-[10px] border-2 border-white animate-pulse hidden" id="dash-trade-alert">LIVE</span>
+                            <span>RECENT PULLS & ACQUISITIONS</span>
                         </h3>
-                        <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 bg-gray-50" id="dash-trades-list">
-                            <div class="text-center font-bold mt-10 bg-white p-3 brutal-border text-xs">WAITING FOR BOT OFFERS...</div>
+                        <div class="flex-1 overflow-y-auto p-3 grid grid-cols-2 gap-2 bg-gray-50" id="dash-recent-grid">
+                            <div class="col-span-2 text-center text-xs text-gray-500 font-bold p-4">No recent acquisitions yet. Open crates or trade in market!</div>
                         </div>
                     </div>
 
-                    <!-- Global Comms & Live Pack Opener Log -->
-                    <div class="brutal-box p-0 flex flex-col bg-white">
-                        <h3 class="font-black-custom text-lg p-3 border-b-4 border-black bg-accent text-black uppercase flex items-center justify-between">
-                            <span class="flex items-center gap-2"><i class="ph ph-broadcast"></i> LIVE PACK LOG</span>
-                            <span class="text-[10px] font-bold bg-black text-white px-2 py-0.5" id="bot-count-ui">30 BOTS ONLINE</span>
+                    <div class="col-span-1 lg:col-span-2 brutal-box p-0 flex flex-col bg-white">
+                        <h3 class="font-black-custom text-sm sm:text-lg p-3 border-b-4 border-black bg-accent text-black uppercase flex items-center justify-between">
+                            <span class="flex items-center gap-2"><i class="ph ph-broadcast"></i> LIVE MARKET ACTIVITY</span>
+                            <span class="text-[9px] font-bold bg-black text-white px-2 py-0.5" id="multiplayer-count-badge">LIVE NETWORK</span>
                         </h3>
                         <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 font-bold text-xs bg-gray-100" id="global-chat">
-                            <div class="text-gray-500 italic p-1 text-center bg-white brutal-border mb-2">Connecting to live market pack feeds...</div>
-                        </div>
-                        <div class="p-2.5 border-t-3 border-black bg-white flex gap-2 hidden">
-                            <input id="chat-input" type="text" placeholder="SEND EMOTE / MESSAGE..." class="flex-1 brutal-input text-xs py-1 uppercase">
-                            <button id="btn-chat-send" class="brutal-btn px-3 py-1 bg-black text-white text-xs">SEND</button>
+                            <div class="text-gray-500 italic p-1 text-center bg-white brutal-border mb-2">Connecting to multiplayer server...</div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Open Market -->
+            <div id="screen-market" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6 overflow-hidden">
+                <div class="flex flex-wrap items-center justify-between border-b-4 border-black pb-4 mb-4 gap-4">
+                    <div>
+                        <h2 class="font-black-custom text-2xl sm:text-3xl uppercase flex items-center gap-2">
+                            <i class="ph ph-chart-line-up text-accentGreen"></i> OPEN MARKET EXCHANGE (60+ CARDS)
+                        </h2>
+                        <p class="font-bold text-xs text-gray-600 mt-1">Real-time dynamic stock values driven by simulated trader volume.</p>
+                    </div>
+                    <div class="flex items-center gap-4 bg-gray-100 p-2 brutal-border">
+                        <div class="text-xs font-bold">
+                            <span class="text-gray-500 uppercase block text-[9px]">MARKET STATUS</span>
+                            <span class="text-accentGreen font-black-custom uppercase animate-pulse">● ACTIVE TRADING</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3 items-center justify-between mb-4 bg-gray-50 p-3 brutal-border">
+                    <div class="flex flex-wrap gap-2 items-center font-bold">
+                        <select id="market-filter-rarity" class="brutal-input text-xs">
+                            <option value="all">ALL RARITIES</option>
+                        </select>
+                        <select id="market-filter-category" class="brutal-input text-xs">
+                            <option value="all">ALL CATEGORIES</option>
+                        </select>
+                    </div>
+                    <div class="text-[10px] sm:text-xs font-black-custom bg-black text-white px-3 py-1.5 border border-black">
+                        CLICK ANY CARD TO BUY OR SELL COPIES
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto pr-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8" id="market-grid">
+                        <!-- Market Cards injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crates Screen -->
             <div id="screen-crates" class="screen-content hidden h-full flex flex-col relative z-10">
                 <div class="flex justify-between items-end mb-4 bg-white p-5 brutal-box">
                     <div>
-                        <h2 class="font-black-custom text-3xl uppercase">SUPPLY DEPOT & BLACK MARKET</h2>
-                        <p class="font-bold text-xs mt-1 border-l-4 border-accent pl-2">Acquire container packs to expand your passive revenue empire.</p>
-                    </div>
-                    <div class="bg-black text-white px-3 py-1.5 brutal-border border-white flex items-center gap-2 font-bold text-xs">
-                        <i class="ph ph-package text-accent text-xl"></i>
-                        <span>BASIC CRATE STOCK:</span>
-                        <span class="font-black-custom text-xl" id="crate-inventory-count">0</span>
+                        <h2 class="font-black-custom text-3xl uppercase">SUPPLY DEPOT</h2>
+                        <p class="font-bold text-xs mt-1 border-l-4 border-accent pl-2">Acquire themed containers to discover unique rare cards.</p>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" id="crates-grid">
-                    <!-- Populated by JS -->
-                </div>
-
-                <!-- Black Market Secret Rotating Sale -->
-                <div class="brutal-box bg-black text-white p-4 flex items-center justify-between mt-auto">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-accentRed brutal-border border-white flex items-center justify-center text-2xl font-bold">
-                            <i class="ph ph-skull"></i>
-                        </div>
-                        <div>
-                            <div class="font-black-custom text-lg text-accent uppercase">BLACK MARKET CONTRABAND</div>
-                            <div class="text-xs text-gray-300 font-bold" id="black-market-title">SPECIAL MYTHIC BUNDLE AVAILABLE!</div>
-                        </div>
-                    </div>
-                    <button id="btn-buy-contraband" class="brutal-btn px-5 py-2.5 bg-accentRed text-white text-sm font-black-custom">
-                        BUY MYTHIC PACK ($500,000)
-                    </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 flex-1 overflow-y-auto" id="crates-grid">
+                    <!-- Crates injected here -->
                 </div>
             </div>
 
-            <div id="screen-collection" class="screen-content hidden h-full flex flex-col relative z-10 bg-white/95 brutal-box p-5">
-                <div class="flex flex-wrap gap-3 items-center justify-between mb-4 pb-3 border-b-4 border-black">
+            <!-- Collection Screen -->
+            <div id="screen-collection" class="screen-content hidden h-full flex flex-col relative z-10 bg-white/95 brutal-box p-5 overflow-hidden">
+                <div class="flex flex-wrap gap-3 items-center justify-between mb-4 pb-3 border-b-4 border-black shrink-0">
                     <div>
-                        <h2 class="font-black-custom text-3xl uppercase">CARDDEX DATABASE</h2>
-                        <div class="text-xs font-bold text-gray-600">CLICK ANY CARD TO INSPECT, UPGRADE LEVEL, OR LIST FOR SALE</div>
+                        <h2 class="font-black-custom text-2xl sm:text-3xl uppercase">CARDDEX DATABASE</h2>
+                        <div class="text-xs font-bold text-gray-600">VIEW YOUR UNIQUE ASSETS, FLAVOR TEXT AND YIELD</div>
                     </div>
-                    <div class="flex flex-wrap gap-2 items-center font-bold">
-                        <select id="filter-rarity" class="brutal-input text-xs">
+                    <div class="flex items-center gap-2">
+                        <select id="collection-filter-rarity" class="brutal-input text-xs font-bold">
                             <option value="all">ALL RARITIES</option>
-                            <option value="common">COMMON</option>
-                            <option value="uncommon">UNCOMMON</option>
-                            <option value="rare">RARE</option>
-                            <option value="epic">EPIC</option>
-                            <option value="legendary">LEGENDARY</option>
-                            <option value="mythic">MYTHIC</option>
-                            <option value="voidTier">VOID TIER</option>
                         </select>
-                        <select id="filter-category" class="brutal-input text-xs">
+                        <select id="collection-filter-category" class="brutal-input text-xs font-bold">
                             <option value="all">ALL CATEGORIES</option>
-                            <option value="Robots">ROBOTS</option>
-                            <option value="Monsters">MONSTERS</option>
-                            <option value="Space">SPACE</option>
-                            <option value="Cyberpunk">CYBERPUNK</option>
                         </select>
-                        <select id="sort-cards" class="brutal-input bg-accent text-xs">
-                            <option value="id">SORT: ID</option>
-                            <option value="income">SORT: INCOME</option>
-                            <option value="rarity">SORT: RARITY</option>
-                            <option value="qty">SORT: QUANTITY</option>
+                        <select id="collection-sort" class="brutal-input text-xs font-bold">
+                            <option value="value">SORT BY VALUE</option>
+                            <option value="income">SORT BY YIELD</option>
+                            <option value="qty">SORT BY QUANTITY</option>
                         </select>
                     </div>
                 </div>
                 <div class="flex-1 overflow-y-auto pr-2">
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 pb-8" id="collection-grid">
-                        <!-- Populated by JS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-8" id="collection-grid">
+                        <!-- Inventory injected here -->
                     </div>
                 </div>
             </div>
 
+            <!-- Forge Screen -->
             <div id="screen-forge" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6">
-                <div class="flex justify-between items-center border-b-4 border-black pb-4 mb-4">
+                <div class="flex justify-between items-center border-b-4 border-black pb-4 mb-4 shrink-0">
                     <div>
-                        <h2 class="font-black-custom text-3xl uppercase flex items-center gap-2">
-                            <i class="ph ph-fire text-accentRed"></i> THE FORGE & CARD CRAFTING LAB
+                        <h2 class="font-black-custom text-2xl sm:text-3xl uppercase flex items-center gap-2">
+                            <i class="ph ph-fire text-accentRed"></i> THE FORGE / FUSION LAB
                         </h2>
-                        <p class="font-bold text-xs text-gray-600 mt-0.5">Combine 3 duplicate cards to fuse a higher rarity card or unlock holographic FOIL status!</p>
+                        <p class="font-bold text-xs text-gray-600 mt-0.5">Burn 3 duplicate cards to craft a random item from the NEXT rarity tier!</p>
                     </div>
                 </div>
 
-                <div class="flex-1 flex items-center justify-center bg-gray-100 brutal-border border-dashed border-4">
-                    <div class="text-center font-black-custom text-2xl text-gray-400">FORGE SYSTEM COMING IN PATCH v2.1</div>
+                <div class="flex flex-col lg:flex-row flex-1 gap-6 min-h-0">
+                    <div class="w-full lg:w-1/2 flex flex-col brutal-border bg-gray-50 h-64 lg:h-auto">
+                        <div class="p-3 bg-black text-white font-black-custom uppercase text-sm border-b-4 border-black sticky top-0 z-10">AVAILABLE FOR FUSION (QTY 3+)</div>
+                        <div class="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 gap-4" id="forge-inventory">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-1/2 flex flex-col items-center justify-center brutal-border bg-white p-6 relative overflow-hidden flex-1" id="forge-action-area">
+                        <div class="text-center text-gray-400 font-black-custom text-xl" id="forge-empty-state">SELECT A CARD WITH 3+ COPIES TO FORGE</div>
+                    </div>
                 </div>
             </div>
 
-            <div id="screen-arena" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-5">
-                <div class="flex justify-between items-center border-b-4 border-black pb-3 mb-4">
+            <!-- Battle Arena Screen -->
+            <div id="screen-arena" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6">
+                <div class="flex flex-wrap gap-4 justify-between items-center border-b-4 border-black pb-4 mb-4 shrink-0">
                     <div>
                         <h2 class="font-black-custom text-3xl uppercase flex items-center gap-2">
                             <i class="ph ph-sword text-accentRed"></i> CARD BATTLE ARENA
                         </h2>
-                        <p class="font-bold text-xs text-gray-600">Form a 3-Card Deck and defeat sector bosses to win cash & exclusive trophies!</p>
+                        <p class="font-bold text-xs text-gray-600">Pits your Top 3 Yield Cards against rival traders!</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-bold uppercase block text-gray-500">ARENA REWARDS</span>
+                        <span class="font-black-custom text-accentPurple text-sm">+50 💎 CRYSTALS ON WIN</span>
                     </div>
                 </div>
-                <div class="flex-1 flex items-center justify-center bg-gray-100 brutal-border border-dashed border-4">
-                    <div class="text-center font-black-custom text-2xl text-gray-400">BATTLE ARENA COMING IN PATCH v2.1</div>
+                <div class="flex-1 flex flex-col items-center justify-center bg-gray-50 brutal-border p-6 gap-6 relative overflow-y-auto">
+                    <div id="arena-battle-log" class="text-xs font-black-custom bg-black text-white px-4 py-2 brutal-border border-white hidden z-20 absolute top-4">
+                        COMBAT IN PROGRESS...
+                    </div>
+
+                    <div class="flex flex-col items-center w-full">
+                        <div class="font-black-custom text-xl mb-4 bg-black text-white px-4 py-1">YOUR TOP SQUAD (POWER: <span id="arena-player-power" class="text-accentGreen">0</span>)</div>
+                        <div class="flex gap-4 flex-wrap justify-center" id="arena-player-cards">
+                        </div>
+                    </div>
+
+                    <div class="text-4xl font-black-custom text-accentRed animate-bounce shrink-0">VS</div>
+
+                    <div class="flex flex-col items-center w-full">
+                        <div class="font-black-custom text-xl mb-4 bg-gray-300 text-black px-4 py-1 brutal-border shadow-brutal-sm flex items-center gap-2">
+                            <span id="arena-opponent-name">CHALLENGER SQUAD</span>
+                            <span class="text-xs bg-black text-white px-2 py-0.5 ml-2">POWER: <span id="arena-bot-power">?</span></span>
+                        </div>
+                        <div class="flex gap-4 flex-wrap justify-center" id="arena-bot-cards">
+                            <div class="w-24 h-32 sm:w-32 sm:h-44 bg-gray-200 border-4 border-dashed border-gray-400 flex items-center justify-center"><i class="ph ph-question text-4xl text-gray-400"></i></div>
+                        </div>
+                    </div>
+
+                    <button id="btn-arena-fight" class="brutal-btn px-6 py-3 sm:px-12 sm:py-4 bg-accentRed text-white text-lg sm:text-2xl font-black-custom shadow-brutal hover:bg-red-600 transition-all shrink-0">
+                        INITIATE COMBAT ($1,000 ENTRY)
+                    </button>
                 </div>
             </div>
 
+            <!-- Auction Screen -->
             <div id="screen-auction" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6">
-                <div class="flex justify-between items-center border-b-4 border-black pb-4 mb-4">
+                <div class="flex justify-between items-center border-b-4 border-black pb-4 mb-4 shrink-0">
                     <div>
                         <h2 class="font-black-custom text-3xl uppercase flex items-center gap-2">
                             <i class="ph ph-gavel text-accentPurple"></i> LIVE AUCTION HOUSE
                         </h2>
-                        <p class="font-bold text-xs text-gray-600">Compete against 30 NPC bots in real-time timed bidding wars!</p>
+                        <p class="font-bold text-xs text-gray-600">Bid in real-time against traders for high-value cards.</p>
                     </div>
                 </div>
-                <div class="flex-1 flex items-center justify-center bg-gray-100 brutal-border border-dashed border-4">
-                    <div class="text-center font-black-custom text-2xl text-gray-400">AUCTION HOUSE COMING IN PATCH v2.1</div>
-                </div>
-            </div>
+                <div class="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
+                    <div class="flex-1 brutal-border bg-gray-50 flex flex-col items-center justify-center relative p-6 overflow-hidden min-h-[300px]">
+                        <div id="auction-status" class="absolute top-4 left-4 bg-black text-white px-3 py-1 font-black-custom text-xs animate-pulse z-10">AUCTION ACTIVE</div>
+                        <div id="auction-timer-display" class="absolute top-4 right-4 font-black-custom text-3xl text-accentRed z-10">30s</div>
+                        
+                        <div id="auction-card-container" class="transform sm:scale-110 my-6 transition-all flex items-center justify-center">
+                            <div class="text-gray-400 font-black-custom text-xl">WAITING FOR NEXT AUCTION...</div>
+                        </div>
 
-            <div id="screen-trades" class="screen-content hidden h-full flex flex-col relative z-10">
-                <div class="mb-4 bg-accent p-4 brutal-box flex justify-between items-center">
-                    <h2 class="font-black-custom text-3xl uppercase">EXCHANGE NETWORK</h2>
-                    <span class="font-bold text-xs bg-black text-white px-3 py-1 brutal-border border-white">30 NPC BOTS ACTIVELY TRADING</span>
-                </div>
-                <div class="flex gap-6 h-[calc(100%-5rem)]">
-                    <!-- Inbox -->
-                    <div class="w-1/3 brutal-box flex flex-col bg-white shrink-0">
-                        <div class="p-3 border-b-4 border-black font-black-custom text-base bg-black text-white flex justify-between items-center">
-                            <span>INCOMING OFFERS</span>
-                            <span class="text-xs bg-accentRed px-2 py-0.5 text-white" id="trade-count-badge">0</span>
-                        </div>
-                        <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 bg-gray-100" id="trade-inbox">
-                            <div class="text-center text-xs text-gray-500 font-bold mt-4">No active offers. Tap on bot unpacks in the dashboard to initiate a trade!</div>
+                        <div class="text-center w-full max-w-md z-10 bg-white/80 p-2 brutal-border mt-4">
+                            <div class="text-xs font-bold text-gray-500 uppercase mb-1">CURRENT BID</div>
+                            <div id="auction-current-bid" class="font-black-custom text-2xl sm:text-4xl mb-2">$0</div>
+                            <div id="auction-highest-bidder" class="text-sm font-bold bg-gray-200 px-3 py-1 inline-block mb-2 sm:mb-4 brutal-border">NO BIDS YET</div>
+                            
+                            <button id="btn-place-bid" class="brutal-btn w-full py-2 sm:py-4 bg-accent text-black text-lg sm:text-xl font-black-custom">
+                                PLACE BID (+10%)
+                            </button>
                         </div>
                     </div>
-                    <!-- Trade Detail View -->
-                    <div class="flex-1 brutal-box flex flex-col relative bg-white" id="trade-detail-container">
-                        <div class="absolute inset-0 flex items-center justify-center flex-col bg-[radial-gradient(#000_1px,transparent_1px)] bg-[size:16px_16px]" id="trade-placeholder">
-                            <div class="brutal-box p-8 bg-white text-center">
-                                <i class="ph ph-handshake text-6xl mb-4"></i>
-                                <h3 class="font-black-custom text-2xl uppercase">NO TRADE SELECTED</h3>
-                                <p class="font-bold text-xs text-gray-600 mt-1">Select an active offer from the left inbox.</p>
-                            </div>
-                        </div>
-                        <div id="trade-active-view" class="hidden flex flex-col h-full z-10 bg-white p-6">
-                            <!-- Populated dynamically -->
-                            <h3 class="font-black-custom text-2xl mb-4 border-b-4 border-black pb-2">ACTIVE PROPOSAL</h3>
-                            <div id="trade-offer-content" class="flex-1 flex flex-col items-center justify-center gap-6"></div>
-                            <div class="flex gap-4 mt-6">
-                                <button id="btn-accept-trade" class="brutal-btn flex-1 py-3 bg-accentGreen text-black font-black-custom text-lg">ACCEPT & PAY</button>
-                                <button id="btn-decline-trade" class="brutal-btn flex-1 py-3 bg-accentRed text-white font-black-custom text-lg">DECLINE</button>
-                            </div>
+                    <div class="w-full lg:w-1/3 brutal-border flex flex-col bg-white h-48 lg:h-auto shrink-0">
+                        <div class="p-3 bg-black text-white font-black-custom uppercase text-sm border-b-4 border-black sticky top-0">BID LOG</div>
+                        <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 bg-gray-100 font-bold text-xs" id="auction-log">
+                            <div class="text-gray-500 italic text-center">Waiting for bids...</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="screen-market" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6">
-                <h2 class="font-black-custom text-3xl uppercase mb-4 border-b-4 border-black pb-2">OPEN MARKET</h2>
-                <div class="flex-1 flex items-center justify-center bg-gray-100 brutal-border border-dashed border-4">
-                    <div class="text-center font-black-custom text-2xl text-gray-400">PLAYER MARKET COMING SOON</div>
-                </div>
-            </div>
-
-            <div id="screen-sets" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6">
-                <h2 class="font-black-custom text-3xl uppercase mb-4 border-b-4 border-black pb-2">COLLECTION SETS & MULTIPLIERS</h2>
-                <div class="flex-1 flex items-center justify-center bg-gray-100 brutal-border border-dashed border-4">
-                    <div class="text-center font-black-custom text-2xl text-gray-400">SETS COMING SOON</div>
-                </div>
-            </div>
-
-            <div id="screen-quests" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6">
-                <h2 class="font-black-custom text-3xl uppercase mb-4 border-b-4 border-black pb-2">DIRECTIVES & UNLOCKABLE BADGES</h2>
-                <div class="flex-1 flex items-center justify-center bg-gray-100 brutal-border border-dashed border-4">
-                    <div class="text-center font-black-custom text-2xl text-gray-400">QUESTS COMING SOON</div>
-                </div>
-            </div>
-
+            <!-- Leaderboard -->
             <div id="screen-leaderboard" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-0">
-                <div class="p-4 bg-black text-white border-b-4 border-black flex justify-between items-center">
+                <div class="p-4 bg-black text-white border-b-4 border-black flex justify-between items-center shrink-0">
                     <div>
-                        <h2 class="font-black-custom text-2xl uppercase">GLOBAL RANKINGS & PRESTIGE</h2>
-                        <div class="text-xs text-gray-300 font-bold">30 AI NPC TRADERS COMPETITION</div>
+                        <h2 class="font-black-custom text-2xl uppercase">GLOBAL MARKET MOGULS</h2>
+                        <div class="text-xs text-gray-300 font-bold" id="leaderboard-subhead">LIVE NETWORK TRADERS</div>
                     </div>
                 </div>
                 <div class="flex flex-col overflow-hidden h-full">
-                    <div class="flex bg-gray-200 p-3 border-b-4 border-black font-black-custom uppercase text-xs">
+                    <div class="flex bg-gray-200 p-3 border-b-4 border-black font-black-custom uppercase text-xs sticky top-0 z-10">
                         <div class="w-16 text-center">RANK</div>
-                        <div class="flex-1 pl-4">ENTITY</div>
-                        <div class="w-40 text-right">NET WORTH ($)</div>
-                        <div class="w-40 text-right">INCOME/s</div>
+                        <div class="flex-1">TRADER</div>
+                        <div class="w-20 text-center hidden sm:block">LVL</div>
+                        <div class="w-32 text-right">NET WORTH</div>
                     </div>
-                    <div class="flex-1 overflow-y-auto bg-[radial-gradient(#000_1px,transparent_1px)] bg-[size:16px_16px]" id="leaderboard-list"></div>
+                    <div class="flex-1 overflow-y-auto" id="leaderboard-list">
+                        <!-- Populated by JS -->
+                    </div>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <!-- Save / Load System Modal -->
-    <div id="modal-save" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-6">
-        <div class="brutal-box p-6 bg-white max-w-lg w-full relative">
-            <button id="btn-close-save-modal" class="absolute -top-4 -right-4 w-10 h-10 bg-accentRed text-white brutal-border font-black-custom text-xl">✕</button>
-            <h3 class="font-black-custom text-2xl uppercase border-b-4 border-black pb-2 mb-4">SAVE & BACKUP TERMINAL</h3>
+    <!-- Crate Modal -->
+    <div id="modal-crate-open" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[100] hidden flex flex-col items-center justify-center p-6">
+        <div class="brutal-box p-6 bg-white relative z-10 flex flex-col items-center w-full max-w-5xl overflow-hidden shadow-[10px_10px_0_#ffcc00]">
+            <h2 class="font-black-custom text-2xl sm:text-3xl uppercase mb-4 border-b-4 border-black pb-2 w-full text-center" id="crate-title">DECRYPTING SUPPLY...</h2>
             
-            <div class="flex flex-col gap-4">
-                <button id="btn-manual-save" class="brutal-btn py-3 bg-accent text-black font-black-custom">
-                    SAVE GAME TO LOCAL STORAGE
-                </button>
-
-                <div>
-                    <label class="font-bold text-xs uppercase block mb-1">EXPORT / IMPORT SAVE CODE:</label>
-                    <textarea id="save-code-input" class="brutal-input w-full h-24 text-xs font-mono"></textarea>
-                </div>
-
-                <div class="flex gap-2">
-                    <button id="btn-export-save" class="brutal-btn flex-1 py-2 bg-black text-white text-xs">EXPORT TO CLIPBOARD</button>
-                    <button id="btn-import-save" class="brutal-btn flex-1 py-2 bg-accentCyan text-black text-xs">IMPORT SAVE CODE</button>
-                </div>
-
-                <button id="btn-wipe-save" class="brutal-btn py-2 bg-accentRed text-white text-xs mt-4">
-                    ⚠️ WIPE ALL SAVE DATA
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Crate Opening Overlay -->
-    <div id="modal-crate-open" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] hidden flex flex-col items-center justify-center p-6">
-        <div class="brutal-box p-8 bg-white relative z-10 flex flex-col items-center min-w-[420px] max-w-lg">
-            <h2 class="font-black-custom text-3xl uppercase mb-6 border-b-4 border-black pb-2 w-full text-center" id="crate-title">DECRYPTING...</h2>
-            
-            <div id="crate-visual" class="w-48 h-48 brutal-box bg-accent flex flex-col items-center justify-center cursor-pointer relative hover:-translate-y-2 transition-transform mb-6 group">
-                <i class="ph ph-package text-8xl text-black transition-transform group-hover:scale-110"></i>
-                <div class="absolute -bottom-5 bg-black text-white font-black-custom text-sm px-4 py-1 brutal-border border-white shadow-[2px_2px_0_#fff]">TAP TO OPEN</div>
+            <div id="crate-visual" class="w-48 h-48 sm:w-64 sm:h-64 brutal-box bg-accent flex flex-col items-center justify-center cursor-pointer relative hover:-translate-y-2 transition-transform mb-6 group mx-auto">
+                <i class="ph ph-package text-7xl sm:text-9xl text-black transition-transform group-hover:scale-110"></i>
+                <div class="absolute -bottom-5 bg-black text-white font-black-custom text-xs sm:text-sm px-4 py-2 brutal-border border-white shadow-[4px_4px_0_#000] whitespace-nowrap">TAP TO DECRYPT</div>
             </div>
 
-            <div id="card-reveal-container" class="hidden relative w-full flex justify-center mb-6 h-64 items-center">
-                <div id="revealed-card" class="transform scale-110 origin-center transition-all duration-500">
-                    <!-- Revealed Card Inserted Here -->
-                </div>
-            </div>
-
-            <div id="reveal-info" class="hidden flex-col items-center w-full">
-                <div class="font-black-custom text-2xl text-center mb-3 px-4 py-2 brutal-border w-full bg-black text-white" id="reveal-name">CARD NAME</div>
-                <div class="flex gap-3 mb-4 w-full justify-center text-sm">
-                    <span class="px-3 py-1 font-bold uppercase brutal-border bg-white shadow-brutal-sm" id="reveal-rarity">RARITY</span>
-                    <span class="px-3 py-1 font-bold uppercase brutal-border bg-gray-200 shadow-brutal-sm" id="reveal-cat">CATEGORY</span>
-                </div>
-                <div class="font-black-custom text-2xl bg-accent px-6 py-2 brutal-border shadow-brutal mb-6">+<span id="reveal-income">0</span>/sec</div>
+            <div id="spinner-container" class="hidden w-full relative mb-6">
+                <div class="absolute left-1/2 top-0 bottom-0 w-1.5 bg-accentRed z-30 transform -translate-x-1/2 shadow-[0_0_15px_rgba(255,0,0,1)] pointer-events-none"></div>
+                <div class="absolute left-1/2 -top-4 w-4 h-4 bg-accentRed rotate-45 transform -translate-x-1/2 z-30 border-2 border-black"></div>
+                <div class="absolute left-1/2 -bottom-4 w-4 h-4 bg-accentRed rotate-45 transform -translate-x-1/2 z-30 border-2 border-black"></div>
                 
-                <button id="btn-continue-crate" class="brutal-btn w-full py-3 text-xl bg-accentRed text-white">COLLECT ASSET</button>
+                <div class="w-full bg-gray-900 border-4 border-black h-[220px] overflow-hidden relative shadow-[inset_0_0_20px_rgba(0,0,0,1)] flex items-center">
+                    <div id="spinner-track" class="flex items-center absolute left-0 will-change-transform h-full pt-2">
+                        <!-- Cards injected -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="card-reveal-container" class="hidden relative w-full flex justify-center mb-6 h-[250px] sm:h-[350px] items-center">
+                <div id="revealed-card" class="transform scale-125 sm:scale-[1.3] origin-center transition-all duration-500 drop-shadow-[0_0_30px_rgba(255,255,255,0.8)]">
+                </div>
+            </div>
+
+            <div id="reveal-info" class="hidden flex-col items-center w-full mt-4 sm:mt-8 z-20">
+                <div class="font-black-custom text-xl sm:text-3xl text-center mb-3 px-6 py-2 brutal-border w-full max-w-md bg-black text-white shadow-brutal" id="reveal-name">CARD NAME</div>
+                <div class="flex flex-wrap gap-2 sm:gap-4 mb-4 w-full justify-center text-xs sm:text-sm">
+                    <span class="px-4 py-1.5 font-bold uppercase brutal-border bg-white shadow-brutal-sm" id="reveal-rarity">RARITY</span>
+                    <span class="px-4 py-1.5 font-black-custom uppercase brutal-border bg-accent text-black shadow-brutal-sm">+<span id="reveal-income">0</span>/sec</span>
+                </div>
+                
+                <button id="btn-continue-crate" class="brutal-btn w-full max-w-md py-3 sm:py-4 text-lg sm:text-2xl bg-accentGreen text-black font-black-custom hover:bg-green-400 mt-2">ACCEPT ASSET</button>
             </div>
         </div>
     </div>
 
-    <!-- Interactive Card Inspector Modal -->
-    <div id="modal-card-inspector" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-6">
-        <div class="brutal-box p-6 bg-white relative z-10 flex flex-col md:flex-row gap-6 max-w-3xl w-full">
-            <button id="btn-close-inspector" class="absolute -top-4 -right-4 w-10 h-10 bg-accentRed text-white brutal-border font-black-custom text-xl shadow-brutal-sm flex items-center justify-center z-50">✕</button>
-            
-            <div id="inspector-card-target" class="shrink-0 mx-auto w-64 flex justify-center items-center">
-                <!-- High-res card preview injected here -->
+    <!-- Trade Modal -->
+    <div id="modal-trade" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-4">
+        <div class="brutal-box p-6 bg-white max-w-md w-full relative">
+            <button class="absolute top-2 right-2 text-xl font-black hover:text-accentRed close-modal">X</button>
+            <h2 class="font-black-custom text-2xl uppercase mb-4 border-b-4 border-black pb-2" id="trade-modal-title">TRADE CARD</h2>
+            <div class="flex justify-center mb-4" id="trade-modal-card"></div>
+            <div class="font-bold text-center mb-4">
+                MARKET VALUE: <span id="trade-modal-price" class="text-accentGreen text-xl font-black-custom">$0</span>
             </div>
-
-            <div class="flex-1 flex flex-col justify-between">
-                <div>
-                    <div class="flex justify-between items-start border-b-4 border-black pb-2 mb-3">
-                        <div>
-                            <h3 id="inspect-title" class="font-black-custom text-3xl uppercase leading-none">CARD NAME</h3>
-                            <span id="inspect-id-badge" class="text-xs font-bold bg-black text-white px-2 py-0.5 mt-1 inline-block">ID: C000</span>
-                        </div>
-                        <span id="inspect-rarity-badge" class="font-black-custom px-3 py-1 text-sm uppercase brutal-border shadow-brutal-sm">RARITY</span>
-                    </div>
-
-                    <p id="inspect-lore" class="font-bold text-xs italic bg-gray-100 p-3 brutal-border mb-4">"Flavor text loading..."</p>
-
-                    <div class="grid grid-cols-2 gap-3 font-bold text-xs mb-4">
-                        <div class="bg-gray-50 p-2 brutal-border">
-                            <span class="text-gray-500 uppercase block text-[10px]">PASSIVE REV</span>
-                            <span id="inspect-income" class="text-base font-black-custom text-uncommon">+0/s</span>
-                        </div>
-                        <div class="bg-gray-50 p-2 brutal-border">
-                            <span class="text-gray-500 uppercase block text-[10px]">EST. MARKET VALUE</span>
-                            <span id="inspect-value" class="text-base font-black-custom">$0.00</span>
-                        </div>
-                        <div class="bg-gray-50 p-2 brutal-border">
-                            <span class="text-gray-500 uppercase block text-[10px]">OWNED COPIES</span>
-                            <span id="inspect-qty" class="text-base font-black-custom">x0</span>
-                        </div>
-                        <div class="bg-gray-50 p-2 brutal-border">
-                            <span class="text-gray-500 uppercase block text-[10px]">CARD LEVEL</span>
-                            <span id="inspect-level" class="text-base font-black-custom text-accentPurple">LVL 1</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-2 mt-4"> 
-                    <button class="brutal-btn py-2 bg-gray-300 text-gray-500 font-black-custom cursor-not-allowed">UPGRADE LEVEL (COMING SOON)</button> 
-                    <button class="brutal-btn py-2 bg-gray-300 text-gray-500 font-black-custom cursor-not-allowed">LIST ON MARKET (COMING SOON)</button> 
-                </div>
+            <div class="flex gap-4">
+                <button id="btn-modal-buy" class="brutal-btn flex-1 py-3 bg-accentGreen text-black font-black-custom hidden">BUY COPY</button>
+                <button id="btn-modal-sell" class="brutal-btn flex-1 py-3 bg-accentRed text-white font-black-custom hidden">SELL COPY</button>
             </div>
+            <div class="text-center mt-2 text-xs font-bold text-gray-500">You own: <span id="trade-modal-owned">0</span> copies</div>
         </div>
     </div>
 
-    <!-- Toast Notifications Container -->
-    <div id="notification-container" class="fixed bottom-4 right-4 flex flex-col gap-2"></div>
+    <div id="notification-container" class="fixed bottom-4 right-4 flex flex-col gap-2 z-[9999]"></div>
 
-    <script>
-        // Utilities & Toast System
-        function showToast(message, type = 'info') {
+    <script type="module">
+        // --- 1. RARITY SETTINGS ---
+        const RARITIES = {
+            common: { color: 'bg-gray-400', hex: '#a0a0a0', weight: 60, name: 'COMMON', rank: 1, baseValue: 50, baseIncome: 1 },
+            uncommon: { color: 'bg-green-400', hex: '#00cc66', weight: 25, name: 'UNCOMMON', rank: 2, baseValue: 250, baseIncome: 6 },
+            rare: { color: 'bg-blue-500', hex: '#3366ff', weight: 10, name: 'RARE', rank: 3, baseValue: 1200, baseIncome: 30 },
+            epic: { color: 'bg-purple-500', hex: '#cc33ff', weight: 4, name: 'EPIC', rank: 4, baseValue: 6000, baseIncome: 180 },
+            legendary: { color: 'bg-orange-500', hex: '#ff9900', weight: 0.9, name: 'LEGENDARY', rank: 5, baseValue: 30000, baseIncome: 1200 },
+            mythic: { color: 'bg-red-600', hex: '#ff0000', weight: 0.09, name: 'MYTHIC', rank: 6, baseValue: 180000, baseIncome: 6500 },
+            voidTier: { color: 'bg-cyan-400', hex: '#00f0ff', weight: 0.01, name: 'VOID TIER', rank: 7, baseValue: 1250000, baseIncome: 32000 }
+        };
+
+        // --- 2. MASSIVE HAND-CRAFTED UNIQUE CARDS DATABASE (60+ UNIQUE CARDS) ---
+        const RAW_CARD_DATABASE = [
+            // --- COMMON (12 unique cards) ---
+            { id: "C-01", name: "Rust Scavenger", rarity: "common", category: "Cyberpunk", icon: "ph-wrench", flavor: "Feeds on broken circuits in Lower District 9." },
+            { id: "C-02", name: "Data Leech Bot", rarity: "common", category: "Tech", icon: "ph-bug-beetle", flavor: "Siphons unencrypted megabytes while you sleep." },
+            { id: "C-03", name: "Neon Alley Rover", rarity: "common", category: "Cyberpunk", icon: "ph-moped", flavor: "Delivers illegal firmware patches at top speed." },
+            { id: "C-04", name: "Copper Golem v1", rarity: "common", category: "Mecha", icon: "ph-robot", flavor: "Built from discarded factory press parts." },
+            { id: "C-05", name: "Sewer Parasite", rarity: "common", category: "Monsters", icon: "ph-bug", flavor: "Breathes toxic industrial runoff for energy." },
+            { id: "C-06", name: "Signal Relay Drone", rarity: "common", category: "Space", icon: "ph-broadcast", flavor: "Keeps outer colony comms connected across the belt." },
+            { id: "C-07", name: "Glitch Imp", rarity: "common", category: "Monsters", icon: "ph-ghost", flavor: "Causes minor display errors and phantom notifications." },
+            { id: "C-08", name: "Sub-Orbital Probe", rarity: "common", category: "Space", icon: "ph-radar", flavor: "Captures thermal weather imagery from high orbit." },
+            { id: "C-09", name: "Circuit Beetle", rarity: "common", category: "Tech", icon: "ph-cpu", flavor: "Glares faintly whenever high voltage passes nearby." },
+            { id: "C-10", name: "Street Merc Recruit", rarity: "common", category: "Cyberpunk", icon: "ph-crosshair", flavor: "Fights for pocket change and cheap synthetic gin." },
+            { id: "C-11", name: "Asteroid Mining Rig", rarity: "common", category: "Space", icon: "ph-hammer", flavor: "Crushes ice boulders into raw hydrogen fuel." },
+            { id: "C-12", name: "Obsidian Shard", rarity: "common", category: "Artifacts", icon: "ph-diamond", flavor: "Vibrates quietly near radioactive power cores." },
+
+            // --- UNCOMMON (12 unique cards) ---
+            { id: "U-01", name: "Grid Enforcer Unit", rarity: "uncommon", category: "Cyberpunk", icon: "ph-shield-warning", flavor: "Authorized to use non-lethal shock baton protocols." },
+            { id: "U-02", name: "Quantum RAM Module", rarity: "uncommon", category: "Tech", icon: "ph-microchip", flavor: "Processes billions of probabilities in nanoseconds." },
+            { id: "U-03", name: "Vaporwave Synth", rarity: "uncommon", category: "Cyberpunk", icon: "ph-wave-sine", flavor: "Emits sub-bass pulses that calm cybernetic implants." },
+            { id: "U-04", name: "Heavy Trench Mecha", rarity: "uncommon", category: "Mecha", icon: "ph-sword", flavor: "Designed for thick artillery skirmishes on titan moon dust." },
+            { id: "U-05", name: "Giga Stalker", rarity: "uncommon", category: "Monsters", icon: "ph-spider", flavor: "Camouflages against fiber optic cabling trees." },
+            { id: "U-06", name: "Solar Sail Freighter", rarity: "uncommon", category: "Space", icon: "ph-rocket-launch", flavor: "Rides solar photons between Venusian trade docks." },
+            { id: "U-07", name: "Biomedical Automaton", rarity: "uncommon", category: "Tech", icon: "ph-first-aid-kit", flavor: "Performs open-heart surgery with micrometer laser scalpels." },
+            { id: "U-08", name: "Plasma Cutter Tank", rarity: "uncommon", category: "Mecha", icon: "ph-armchair", flavor: "Melts through blast doors in less than 3 seconds." },
+            { id: "U-09", name: "Deep Sea Crawler", rarity: "uncommon", category: "Monsters", icon: "ph-fish-simple", flavor: "Endures oceanic pressures at trench depth 11,000m." },
+            { id: "U-10", name: "Holographic Pop Idol", rarity: "uncommon", category: "Cyberpunk", icon: "ph-music-notes", flavor: "Sells out stadiums without ever existing in physical space." },
+            { id: "U-11", name: "Lunar Refinery Core", rarity: "uncommon", category: "Space", icon: "ph-factory", flavor: "Extracts Helium-3 for inter-planetary warp reactors." },
+            { id: "U-12", name: "Rune-Inscribed Codex", rarity: "uncommon", category: "Artifacts", icon: "ph-book-bookmark", flavor: "Pages rewrite themselves based on lunar cycles." },
+
+            // --- RARE (10 unique cards) ---
+            { id: "R-01", name: "Cyber Samurai Ronin", rarity: "rare", category: "Cyberpunk", icon: "ph-lightning", flavor: "Master of blade-nanite deflection technomancy." },
+            { id: "R-02", name: "Orbital Ion Cannon", rarity: "rare", category: "Space", icon: "ph-atom", flavor: "Precision orbital kinetic strike hardware." },
+            { id: "R-03", name: "Neural Override Host", rarity: "rare", category: "Tech", icon: "ph-terminal-window", flavor: "Hijacks rival corporate networks without leaving logs." },
+            { id: "R-04", name: "Aegis Siege Dreadnought", rarity: "rare", category: "Mecha", icon: "ph-shield-checkered", flavor: "Has defended Sector 7 from three alien incursions." },
+            { id: "R-05", name: "Void Hive Queen", rarity: "rare", category: "Monsters", icon: "ph-alien", flavor: "Spawns thousands of armored biomech larvae daily." },
+            { id: "R-06", name: "Supercollider Core", rarity: "rare", category: "Tech", icon: "ph-magnet", flavor: "Generates micro black holes for exotic particle research." },
+            { id: "R-07", name: "Nanite Swarm Overlord", rarity: "rare", category: "Tech", icon: "ph-circles-three-plus", flavor: "Consumes enemy vehicles to replicate instantly." },
+            { id: "R-08", name: "Star Cartographer Ship", rarity: "rare", category: "Space", icon: "ph-planet", flavor: "Charts unknown jump gates past the Kuiper Belt." },
+            { id: "R-09", name: "Soul Forge Anvil", rarity: "rare", category: "Artifacts", icon: "ph-fire", flavor: "Binds living plasma into indestructible alloy plating." },
+            { id: "R-10", name: "Infiltration Spectre", rarity: "rare", category: "Cyberpunk", icon: "ph-eye-slash", flavor: "Bends ambient light around its carbon chassis." },
+
+            // --- EPIC (10 unique cards) ---
+            { id: "E-01", name: "Hyperion Titan Mecha", rarity: "epic", category: "Mecha", icon: "ph-skull", flavor: "Stands 80 meters tall. Powered by a compressed star core." },
+            { id: "E-02", name: "Quantum AI Sentinel", rarity: "epic", category: "Tech", icon: "ph-brain", flavor: "Calculates the future 10 minutes before it occurs." },
+            { id: "E-03", name: "Sub-Zero Cryo Dragon", rarity: "epic", category: "Monsters", icon: "ph-snowflake", flavor: "Freezes surrounding thermal energy down to Absolute Zero." },
+            { id: "E-04", name: "Apex Hacker Syndicate", rarity: "epic", category: "Cyberpunk", icon: "ph-fingerprint", flavor: "Controls 40% of all planetary banking credentials." },
+            { id: "E-05", name: "Chronos Time Diode", rarity: "epic", category: "Artifacts", icon: "ph-hourglass", flavor: "Reverses regional entropy by up to thirty seconds." },
+            { id: "E-06", name: "Dreadnought Leviathan", rarity: "epic", category: "Space", icon: "ph-globe-hemisphere-east", flavor: "Warp ship capable of cracking moon crusts." },
+            { id: "E-07", name: "Biohazard Abomination", rarity: "epic", category: "Monsters", icon: "ph-biohazard", flavor: "Mutates rapidly when exposed to radiation fields." },
+            { id: "E-08", name: "Eclipse Orbital Array", rarity: "epic", category: "Space", icon: "ph-sun-dim", flavor: "Blocks entire star systems from receiving solar light." },
+            { id: "E-09", name: "Valhalla Cyber Valkyrie", rarity: "epic", category: "Cyberpunk", icon: "ph-wings", flavor: "Extracts fallen soldier neural consciousness for reboot." },
+            { id: "E-10", name: "Aether Prism Ring", rarity: "epic", category: "Artifacts", icon: "ph-sparkle", flavor: "Focuses cosmic background energy into raw material." },
+
+            // --- LEGENDARY (8 unique cards) ---
+            { id: "L-01", name: "Archangel Prime", rarity: "legendary", category: "Mecha", icon: "ph-crown", flavor: "Divine defense construct built before the Cyber War." },
+            { id: "L-02", name: "Omniscient Matrix Core", rarity: "legendary", category: "Tech", icon: "ph-tree-structure", flavor: "The central nervous system of human interplanetary network." },
+            { id: "L-03", name: "Cosmic World Eater", rarity: "legendary", category: "Monsters", icon: "ph-spiral", flavor: "Rips through planetary rings leaving void cosmic dust." },
+            { id: "L-04", name: "Neo Tokyo Emperor", rarity: "legendary", category: "Cyberpunk", icon: "ph-identification-card", flavor: "Commands the global cyber warfare military defense force." },
+            { id: "L-05", name: "Singularity Engine", rarity: "legendary", category: "Space", icon: "ph-black-hole", flavor: "Bends spacetime folds to collapse distance down to zero." },
+            { id: "L-06", name: "Pharaoh's Cyber Scepter", rarity: "legendary", category: "Artifacts", icon: "ph-magic-wand", flavor: "Contains the digitized memories of 1,000 ancient kings." },
+            { id: "L-07", name: "Bermuda Rift Dreadnought", rarity: "legendary", category: "Space", icon: "ph-compass", flavor: "Sailed out of the dimensional void after 300 years lost." },
+            { id: "L-08", name: "Hellfire Behemoth", rarity: "legendary", category: "Monsters", icon: "ph-flame", flavor: "Burns with dark anti-matter fire that ignores armor." },
+
+            // --- MYTHIC (5 unique cards) ---
+            { id: "M-01", name: "Genesis Prime God", rarity: "mythic", category: "Artifacts", icon: "ph-infinity", flavor: "The original entity that programmed reality's physical laws." },
+            { id: "M-02", name: "Zero-Point Singularity", rarity: "mythic", category: "Tech", icon: "ph-atom", flavor: "Contains infinite free energy harvested from parallel realms." },
+            { id: "M-03", name: "Void Serpent Jormungandr", rarity: "mythic", category: "Monsters", icon: "ph-snake", flavor: "Encircles the solar system. Its breath extinguishes stars." },
+            { id: "M-04", name: "Solarian Overlord", rarity: "mythic", category: "Space", icon: "ph-sun", flavor: "Uses a Dyson Sphere star harness as its primary weapon." },
+            { id: "M-05", name: "Cyber God Cyberia", rarity: "mythic", category: "Cyberpunk", icon: "ph-users-four", flavor: "Achieved absolute digital omnipresence across all universes." },
+
+            // --- VOID TIER (3 unique ultimate cards) ---
+            { id: "V-01", name: "THE VOID ARCHITECT", rarity: "voidTier", category: "Cosmic", icon: "ph-eye", flavor: "Existed before time itself. Shapes galaxies with a thought." },
+            { id: "V-02", name: "NULL EXISTENCE ENGINE", rarity: "voidTier", category: "Cosmic", icon: "ph-prohibit", flavor: "Erases target physical reality threads permanently." },
+            { id: "V-03", name: "ETERNITY MOGUL AVATAR", rarity: "voidTier", category: "Cosmic", icon: "ph-trophy", flavor: "The absolute ruler of all wealth, cards and market systems." }
+        ];
+
+        // Process cards into runtime lookup object
+        const CARD_DB = {};
+        RAW_CARD_DATABASE.forEach(c => {
+            const r = RARITIES[c.rarity];
+            CARD_DB[c.id] = {
+                id: c.id,
+                name: c.name,
+                rarity: c.rarity,
+                category: c.category,
+                icon: c.icon,
+                flavor: c.flavor,
+                baseValue: r.baseValue,
+                baseIncome: r.baseIncome,
+                currentPrice: r.baseValue
+            };
+        });
+
+        // Dynamic Crate Definitions
+        const CRATES = [
+            { 
+                id: "crate-basic", 
+                name: "RECYCLE DEPOT", 
+                price: 500, 
+                desc: "Great for starters. Contains Common & Uncommon items.", 
+                color: "bg-gray-200", 
+                icon: "ph-package", 
+                weights: { common: 75, uncommon: 22, rare: 3, epic: 0, legendary: 0, mythic: 0, voidTier: 0 } 
+            },
+            { 
+                id: "crate-pro", 
+                name: "CYBER VAULT", 
+                price: 2500, 
+                desc: "Guaranteed Uncommon+. Strong Rare and Epic pull rates.", 
+                color: "bg-blue-200", 
+                icon: "ph-briefcase", 
+                weights: { common: 0, uncommon: 60, rare: 30, epic: 9, legendary: 1, mythic: 0, voidTier: 0 } 
+            },
+            { 
+                id: "crate-highroller", 
+                name: "TITAN ARSENAL", 
+                price: 12500, 
+                desc: "High end cache. High Legendary and Epic drop rate.", 
+                color: "bg-purple-200", 
+                icon: "ph-lightning", 
+                weights: { common: 0, uncommon: 0, rare: 55, epic: 35, legendary: 9, mythic: 1, voidTier: 0 } 
+            },
+            { 
+                id: "crate-whale", 
+                name: "MOGUL OMNI-VAULT", 
+                price: 60000, 
+                desc: "Ultimate crate. High Mythic odds and chance for VOID TIER!", 
+                color: "bg-accent", 
+                icon: "ph-vault", 
+                weights: { common: 0, uncommon: 0, rare: 20, epic: 50, legendary: 24, mythic: 5.8, voidTier: 0.2 } 
+            }
+        ];
+
+        // --- 3. MULTIPLAYER SIMULATION ENGINE ---
+        const BOT_NAMES = [
+            "WHALE_KING", "CRYPTO_KNIGHT", "CARD_BARON", "NEO_TRADER", "GLITCH_99", 
+            "CYBER_PUNK", "VOID_WALKER", "HOLO_HUNTER", "RNG_JESUS", "PACK_RIPPER", 
+            "MARKET_MAKER", "DIAMOND_HANDS", "PAPER_HANDS", "THE_COLLECTOR", "SNIPER_BOT", 
+            "ALICE_IN_CHAIN", "BOB_THE_BUILDER", "SHILL_MASTER", "PUMP_AND_DUMP", "NEURO_MANCER",
+            "CREDIT_CARD_CHAN", "LUCK_ISSUES", "WHALE_TEARS", "APEX_PREDATOR", "WALL_STREET_BET",
+            "STONKS_ONLY_UP", "MOON_BOY"
+        ];
+
+        let bots = BOT_NAMES.map((name, i) => {
+            let multiplier = Math.pow(1.5, Math.floor(Math.random() * 15));
+            return {
+                name: name,
+                balance: 1000 * multiplier,
+                netWorth: 5000 * multiplier,
+                level: Math.floor(Math.random() * 80) + 1,
+                inventory: []
+            };
+        });
+
+        // --- 4. PLAYER STATE ---
+        let player = {
+            name: "GUEST_TRADER",
+            balance: 2000,
+            crystals: 0,
+            xp: 0,
+            level: 1,
+            inventory: {}, // cardId: quantity
+            recentAcquisitions: []
+        };
+        let passiveIncome = 0;
+        let lastTick = Date.now();
+
+        // --- 5. AUCTION STATE ---
+        let currentAuction = {
+            active: false,
+            card: null,
+            timer: 0,
+            currentBid: 0,
+            highestBidder: null,
+            interval: null
+        };
+
+        // --- 6. HELPER FUNCTIONS ---
+        const formatMoney = (val) => '$' + Math.floor(val).toLocaleString();
+        const getCard = (id) => CARD_DB[id];
+        
+        function showToast(msg, type = "info") {
             const container = document.getElementById('notification-container');
             const toast = document.createElement('div');
-            
-            let bgClass = 'bg-white text-black';
-            if (type === 'error') bgClass = 'bg-accentRed text-white';
-            if (type === 'success') bgClass = 'bg-accentGreen text-black';
-            if (type === 'warning') bgClass = 'bg-accent text-black';
+            let color = 'bg-white';
+            if (type === 'success') color = 'bg-accentGreen';
+            if (type === 'error') color = 'bg-accentRed text-white';
+            if (type === 'mythic') color = 'bg-black text-white border-accent shadow-[0_0_15px_#ff0000]';
 
-            toast.className = `toast p-3 brutal-border shadow-brutal-sm font-black-custom text-xs uppercase flex items-center gap-2 transform translate-x-full ${bgClass}`;
-            toast.innerHTML = `<i class="ph ph-info text-lg"></i> <span>${message}</span>`;
-            
+            toast.className = `toast ${color} p-3 brutal-border shadow-brutal-sm font-bold text-xs uppercase flex items-center gap-2 animate-bounce`;
+            toast.innerHTML = `<i class="ph ph-bell"></i> <span>${msg}</span>`;
             container.appendChild(toast);
-            
-            // Animate in
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-x-full');
-            });
-
-            // Remove after delay
             setTimeout(() => {
-                toast.classList.add('opacity-0');
+                toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 200);
             }, 3000);
         }
 
-        const formatMoney = (val) => `$${Math.floor(val).toLocaleString()}`;
-        const formatNumber = (val) => Math.floor(val).toLocaleString();
-
-        // -------------------------
-        // Core Data Definitions
-        // -------------------------
-        const CARD_DATABASE = [
-            { id: "C001", name: "Junk Bot", rarity: "common", category: "Robots", income: 0.25, value: 25, lore: "A rusty bucket of bolts. Barely functional.", icon: "ph-robot" },
-            { id: "C002", name: "Street Rat", rarity: "common", category: "Animals", income: 0.50, value: 50, lore: "Survives on discarded data scraps.", icon: "ph-cat" },
-            { id: "C003", name: "Copper Coin", rarity: "common", category: "Ancient", income: 0.75, value: 85, lore: "Worth something to someone.", icon: "ph-coin" },
-            { id: "C004", name: "Scrap Drone", rarity: "common", category: "Robots", income: 1.0, value: 120, lore: "Flies poorly, watches everything.", icon: "ph-paper-plane" },
-            { id: "C005", name: "Neon Sign", rarity: "uncommon", category: "Cyberpunk", income: 3, value: 450, lore: "Flickers in the eternal rain.", icon: "ph-lightbulb" },
-            { id: "C006", name: "Alley Doc", rarity: "uncommon", category: "Cyberpunk", income: 5, value: 800, lore: "No questions asked repairs.", icon: "ph-bandaids" },
-            { id: "C007", name: "Mutant Hound", rarity: "uncommon", category: "Monsters", income: 8, value: 1300, lore: "Two heads are better than one.", icon: "ph-dog" },
-            { id: "C008", name: "Plasma Pistol", rarity: "uncommon", category: "Tech", income: 12, value: 2000, lore: "Standard issue corporate defense.", icon: "ph-crosshair" },
-            { id: "C009", name: "Mecha Knight", rarity: "rare", category: "Robots", income: 30, value: 6000, lore: "Honor bound to its programming.", icon: "ph-sword" },
-            { id: "C010", name: "Cyber Ninja", rarity: "rare", category: "Cyberpunk", income: 45, value: 10000, lore: "Faster than the eye can track.", icon: "ph-mask-happy" },
-            { id: "C011", name: "Star Cruiser", rarity: "rare", category: "Space", income: 65, value: 16000, lore: "Lightyears ahead.", icon: "ph-rocket" },
-            { id: "C012", name: "Abyssal Slime", rarity: "rare", category: "Monsters", income: 90, value: 24000, lore: "Corrodes anything it touches.", icon: "ph-drop" },
-            { id: "C013", name: "Quantum CPU", rarity: "epic", category: "Tech", income: 250, value: 75000, lore: "Calculates infinity in a second.", icon: "ph-cpu" },
-            { id: "C014", name: "Neon Dragon", rarity: "epic", category: "Cyberpunk", income: 400, value: 130000, lore: "Holographic terror of the skies.", icon: "ph-flying-saucer" },
-            { id: "C015", name: "Galactic Miner", rarity: "epic", category: "Space", income: 600, value: 200000, lore: "Strips asteroids bare in minutes.", icon: "ph-planet" },
-            { id: "C016", name: "Void Walker", rarity: "legendary", category: "Space", income: 1800, value: 750000, lore: "Exists outside standard time.", icon: "ph-alien" },
-            { id: "C017", name: "Omega Frame", rarity: "legendary", category: "Robots", income: 2800, value: 1250000, lore: "The ultimate war machine.", icon: "ph-cube" },
-            { id: "C018", name: "Nebula Dragon", rarity: "legendary", category: "Monsters", income: 4200, value: 2000000, lore: "Born in a dying star.", icon: "ph-sparkle" },
-            { id: "C019", name: "Mecha Leviathan", rarity: "mythic", category: "Robots", income: 12500, value: 8500000, lore: "Rises from the silicon depths.", icon: "ph-anchor" },
-            { id: "C020", name: "VOID KNIGHT", rarity: "voidTier", category: "Monsters", income: 50000, value: 50000000, lore: "Bringer of the absolute end.", icon: "ph-skull" },
-        ];
-
-        const BOT_NAMES = [
-            "Alpha_Trader", "ByteMogul", "CyberWhale", "DataBroker", 
-            "EchoScout", "FluxCapital", "GridRunner", "HoloHustler",
-            "IronVault", "JunkKing", "KiloBazaar", "LuminaCorp",
-            "MegaCorp_Bot", "NullPointer", "OmegaSeller", "PulseMarket",
-            "QuantiumX", "RustTrader", "SynthBuyer", "TerraCorp",
-            "Unit_734", "Vektor", "WireShark", "XenonBank",
-            "YieldFarmer", "ZephyrTrade", "BitBaron", "CashNexus",
-            "DeFi_Deity", "EtherScraper"
-        ];
-
-        // -------------------------
-        // Game State
-        // -------------------------
-        let gameState = {
-            balance: 250,
-            inventory: {
-                crates: { "Basic Crate": 0, "Rare Crate": 0, "Epic Crate": 0, "Mythic Crate": 0 }
-            },
-            cards: {}, // { "C001": { qty: 2, level: 1 } }
-            lastDaily: 0,
-            xp: 0,
-            inbox: [], // Active trade offers
-            recentPulls: [] // Store for dashboard
-        };
-
-        let bots = [];
-
-        // -------------------------
-        // Initialization
-        // -------------------------
-        function initGame() {
-            loadGame();
-            initBots();
-            setupNav();
-            updateAllUI();
-            
-            // Core Game Loop (1 second tick)
-            setInterval(gameLoop, 1000);
-            
-            // Bot Pack Opening loop (simulated)
-            setInterval(simulateBotPackOpen, 4000);
-
-            // Audio Toggle
-            document.getElementById('btn-audio-toggle').onclick = () => {
-                showToast("Audio system muted.", "info");
-                document.getElementById('audio-icon').className = 'ph ph-speaker-x text-lg text-accentRed';
-                document.getElementById('audio-label').innerText = 'AUDIO OFF';
-            };
-
-            // Save/Load Modals
-            document.getElementById('btn-open-save-modal').onclick = () => document.getElementById('modal-save').classList.remove('hidden');
-            document.getElementById('btn-close-save-modal').onclick = () => document.getElementById('modal-save').classList.add('hidden');
-            
-            document.getElementById('btn-manual-save').onclick = () => { saveGame(); showToast('Game Saved to Browser!', 'success'); document.getElementById('modal-save').classList.add('hidden'); };
-            document.getElementById('btn-wipe-save').onclick = () => {
-                if(confirm("Are you absolutely sure you want to wipe your save?")) {
-                    localStorage.removeItem('cardMarketSave');
-                    location.reload();
-                }
-            };
-            
-            // Crates Generation
-            renderCratesStore();
-
-            // Daily Bonus Logic
-            setupDailyBonus();
-
-            // Collection Filters
-            document.getElementById('filter-rarity').addEventListener('change', renderCollection);
-            document.getElementById('filter-category').addEventListener('change', renderCollection);
-            document.getElementById('sort-cards').addEventListener('change', renderCollection);
-            document.getElementById('global-search-input').addEventListener('input', () => {
-                if(document.getElementById('screen-collection').classList.contains('hidden')) {
-                    switchTab('screen-collection');
-                }
-                renderCollection();
-            });
-            
-            renderCollection();
-            updateDailyTimer();
-        }
-
-        function initBots() {
-            bots = BOT_NAMES.map(name => {
-                return {
-                    id: 'B_' + name,
-                    name: name,
-                    balance: 1000 + Math.random() * 5000,
-                    income: 10 + Math.random() * 50,
-                    inventory: []
-                };
-            });
-        }
-
-        // -------------------------
-        // Game Loop
-        // -------------------------
-        function gameLoop() {
-            // Player Passive Income
-            const income = getPlayerIncome();
-            gameState.balance += income;
-
-            // Bots Passive Income
-            bots.forEach(bot => {
-                bot.balance += bot.income;
-            });
-
-            // Update UI
-            document.getElementById('ui-balance').innerText = formatMoney(gameState.balance);
-            document.getElementById('ui-income').innerText = formatNumber(income);
-            document.getElementById('dash-col-value').innerText = formatMoney(getCollectionValue());
-            
-            updateDailyTimer();
-            updateLeaderboard(); // In real app, maybe throttle this
-        }
-
-        function simulateBotPackOpen() {
-            // Random chance for a bot to buy and open a pack
-            if (Math.random() > 0.6) return;
-
-            const bot = bots[Math.floor(Math.random() * bots.length)];
-            const isLucky = Math.random() < 0.1;
-            
-            // Select rarity weights based on luck
-            const weights = isLucky ? [0, 0, 50, 30, 15, 4, 1] : [60, 30, 8, 2, 0, 0, 0];
-            const rarities = ["common", "uncommon", "rare", "epic", "legendary", "mythic", "voidTier"];
-            
-            let roll = Math.random() * 100;
-            let sum = 0;
-            let pickedRarity = "common";
-            for(let i=0; i<weights.length; i++) {
-                sum += weights[i];
-                if (roll <= sum) {
-                    pickedRarity = rarities[i];
-                    break;
-                }
-            }
-
-            const possibleCards = CARD_DATABASE.filter(c => c.rarity === pickedRarity);
-            if(possibleCards.length === 0) return;
-            const card = possibleCards[Math.floor(Math.random() * possibleCards.length)];
-
-            // Bot acquires card
-            bot.income += card.income;
-            
-            // Broadcast to Global Comms (Live Pack Opener Log)
-            appendLiveLog(bot, card);
-        }
-
-        function appendLiveLog(bot, card) {
+        function pushGlobalChat(user, msg, colorClass = "text-gray-600") {
             const chat = document.getElementById('global-chat');
-            
-            // Remove the connecting message if it exists
-            const placeholder = chat.querySelector('.italic');
-            if(placeholder) placeholder.remove();
-
             const entry = document.createElement('div');
-            entry.className = 'p-2 border-b-2 border-gray-300 cursor-pointer hover:bg-accent transition-colors text-xs font-bold bg-white shadow-sm';
-            entry.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span class="text-accentPurple">[PACK PULL]</span> 
-                        <b>${bot.name}</b> found <span class="px-1 text-white bg-black ml-1">${card.name}</span>
+            entry.className = `p-2 border-l-4 border-black bg-white shadow-sm mb-1`;
+            entry.innerHTML = `<span class="${colorClass} font-black-custom mr-1">${user}:</span> ${msg}`;
+            chat.appendChild(entry);
+            if (chat.childElementCount > 50) chat.removeChild(chat.firstChild);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function generateCardElement(card, quantity = 0, isMarket = false) {
+            const r = RARITIES[card.rarity];
+            const div = document.createElement('div');
+            div.className = `trading-card rarity-${card.rarity} ${card.rarity === 'mythic' || card.rarity === 'voidTier' ? 'is-foil' : ''}`;
+            div.dataset.id = card.id;
+            
+            div.innerHTML = `
+                <div class="p-2 border-b-4 border-black bg-white flex justify-between items-center z-20 relative">
+                    <span class="font-black-custom text-xs truncate max-w-[70%]" title="${card.name}">${card.name}</span>
+                    <i class="ph ${card.icon} text-lg"></i>
+                </div>
+                <div class="card-art-area z-10">
+                    <i class="ph ${card.icon} text-6xl text-white drop-shadow-md"></i>
+                    ${(card.rarity === 'mythic' || card.rarity === 'voidTier') ? '<div class="holo-overlay"></div>' : ''}
+                    <div class="absolute bottom-1 left-1 bg-black text-white text-[8px] font-black-custom px-1.5 py-0.5 uppercase">${card.category}</div>
+                </div>
+                <div class="p-2 bg-white z-20 relative text-[10px] sm:text-xs">
+                    <div class="text-[9px] italic text-gray-500 mb-1 truncate">${card.flavor || ''}</div>
+                    <div class="flex justify-between font-bold mb-1">
+                        <span class="uppercase" style="color:${r.hex}">${r.name}</span>
+                        <span class="text-accentGreen">+${formatMoney(card.baseIncome)}/s</span>
                     </div>
-                    <span class="text-[10px] text-gray-500 uppercase px-1 border border-gray-400">Trade</span>
+                    <div class="flex justify-between font-black-custom text-sm">
+                        <span>VAL:</span>
+                        <span class="${isMarket ? 'market-price-tag' : ''}">${formatMoney(card.currentPrice)}</span>
+                    </div>
                 </div>
-                <div class="text-gray-500 text-[10px] mt-1 flex justify-between">
-                    <span>Rarity: <span class="text-${card.rarity}">${card.rarity.toUpperCase()}</span></span>
-                    <span>Val: ${formatMoney(card.value)}</span>
-                </div>
+                ${quantity > 0 && !isMarket ? `<div class="absolute -top-2 -right-2 bg-accent text-black font-black-custom px-2 py-1 brutal-border shadow-brutal-sm z-30">x${quantity}</div>` : ''}
+                ${isMarket ? `<div class="absolute inset-0 bg-black/80 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-40 font-black-custom text-white text-xl">TRADE</div>` : ''}
             `;
-
-            // Magic requirement: Clicking log initiates a trade offer
-            entry.onclick = () => {
-                initiateTradeWithBot(bot, card);
-            };
-
-            chat.prepend(entry);
-            
-            // Keep log size manageable
-            if (chat.children.length > 15) {
-                chat.removeChild(chat.lastChild);
-            }
+            return div;
         }
 
-        // -------------------------
-        // Trading System
-        // -------------------------
-        function initiateTradeWithBot(bot, card) {
-            // Check if already offered
-            if (gameState.inbox.find(t => t.card.id === card.id && t.bot.id === bot.id)) {
-                showToast("You already have an active offer for this exact card from this bot.", "warning");
-                return;
-            }
-
-            const tradeId = 'TRD_' + Date.now();
-            
-            // Bot asks for a bit more than market value usually
-            const markup = 1.0 + (Math.random() * 0.5); 
-            const askingPrice = Math.floor(card.value * markup);
-
-            const tradeOffer = {
-                id: tradeId,
-                bot: bot,
-                card: card,
-                askingPrice: askingPrice,
-                timestamp: Date.now()
-            };
-
-            gameState.inbox.push(tradeOffer);
-            saveGame();
-            
-            updateTradesBadge();
-            renderTradeInbox();
-            
-            showToast(`Trade offer received from ${bot.name}!`);
-            switchTab('screen-trades');
-        }
-
-        function updateTradesBadge() {
-            const badge = document.getElementById('ui-trades-badge');
-            const alert = document.getElementById('dash-trade-alert');
-            const countBadge = document.getElementById('trade-count-badge');
-            
-            const count = gameState.inbox.length;
-            
-            if (count > 0) {
-                badge.innerText = count;
-                badge.classList.remove('hidden');
-                alert.classList.remove('hidden');
-                countBadge.innerText = count;
+        function addCardToInventory(cardId) {
+            if (player.inventory[cardId]) {
+                player.inventory[cardId]++;
             } else {
-                badge.classList.add('hidden');
-                alert.classList.add('hidden');
-                countBadge.innerText = '0';
+                player.inventory[cardId] = 1;
             }
+            player.recentAcquisitions.unshift(cardId);
+            if (player.recentAcquisitions.length > 4) player.recentAcquisitions.pop();
+            recalculateStats();
         }
 
-        function renderTradeInbox() {
-            const inbox = document.getElementById('trade-inbox');
-            inbox.innerHTML = '';
+        function recalculateStats() {
+            passiveIncome = 0;
+            let totalValue = player.balance;
+            let uniqueCount = 0;
 
-            if (gameState.inbox.length === 0) {
-                inbox.innerHTML = `<div class="text-center text-xs text-gray-500 font-bold mt-4">No active offers. Tap on bot unpacks in the dashboard to initiate a trade!</div>`;
-                document.getElementById('trade-placeholder').classList.remove('hidden');
-                document.getElementById('trade-active-view').classList.add('hidden');
-                return;
+            for (const [cardId, qty] of Object.entries(player.inventory)) {
+                if (qty > 0) {
+                    const card = getCard(cardId);
+                    if (card) {
+                        passiveIncome += card.baseIncome * qty;
+                        totalValue += card.currentPrice * qty;
+                        uniqueCount++;
+                    }
+                }
             }
 
-            gameState.inbox.forEach(trade => {
-                const item = document.createElement('div');
-                item.className = 'bg-white p-3 brutal-border cursor-pointer hover:bg-accent transition-colors';
-                item.innerHTML = `
-                    <div class="font-black-custom text-sm uppercase">${trade.bot.name}</div>
-                    <div class="text-xs font-bold text-gray-600 mb-1">OFFERING: ${trade.card.name}</div>
-                    <div class="text-xs font-bold bg-gray-200 px-2 py-0.5 inline-block">ASKS: ${formatMoney(trade.askingPrice)}</div>
-                `;
-                item.onclick = () => viewTradeOffer(trade);
-                inbox.appendChild(item);
+            document.getElementById('ui-balance').innerText = formatMoney(player.balance);
+            document.getElementById('ui-income').innerText = passiveIncome.toLocaleString();
+            document.getElementById('dash-col-value').innerText = formatMoney(totalValue);
+            document.getElementById('dash-unique').innerText = `${uniqueCount} / ${Object.keys(CARD_DB).length}`;
+            
+            renderLeaderboard(totalValue);
+        }
+
+        function gainXp(amount) {
+            player.xp += amount;
+            let nextLevel = player.level * 1000;
+            if (player.xp >= nextLevel) {
+                player.level++;
+                player.xp -= nextLevel;
+                showToast(`LEVELED UP TO MOGUL LVL ${player.level}!`, 'success');
+                pushGlobalChat("SYSTEM", `Player ${player.name} reached Level ${player.level}!`, "text-accentPurple");
+            }
+            document.getElementById('ui-player-level').innerText = player.level;
+            document.getElementById('ui-xp-text').innerText = `${Math.floor(player.xp)} / ${nextLevel}`;
+            document.getElementById('ui-xp-bar').style.width = `${(player.xp / nextLevel) * 100}%`;
+        }
+
+        // --- 7. CORE ENGINE & BOT TICKS ---
+        function botEngineTick() {
+            bots.forEach(bot => {
+                bot.balance += (bot.netWorth * 0.001); 
+                bot.netWorth += (bot.netWorth * 0.005 * (Math.random() + 0.5));
+                if (Math.random() < 0.01) bot.level++;
+            });
+
+            if (Math.random() < 0.85) {
+                const activeBot = bots[Math.floor(Math.random() * bots.length)];
+                const eventType = Math.random();
+                const cardKeys = Object.keys(CARD_DB);
+                const randomCard = getCard(cardKeys[Math.floor(Math.random() * cardKeys.length)]);
+                
+                if (eventType < 0.4) {
+                    randomCard.currentPrice *= (1 + (Math.random() * 0.15));
+                    if (randomCard.currentPrice > randomCard.baseValue * 5) randomCard.currentPrice = randomCard.baseValue * 5;
+                    
+                    if(randomCard.rarity === 'legendary' || randomCard.rarity === 'mythic' || randomCard.rarity === 'voidTier') {
+                        pushGlobalChat(activeBot.name, `Sweeping market orders on ${randomCard.name}!`, "text-accentGreen");
+                        showToast(`MARKET SURGE: ${randomCard.name}!`);
+                    }
+                    updateMarketUIPrice(randomCard, 'up');
+
+                } else if (eventType < 0.7) {
+                    randomCard.currentPrice *= (1 - (Math.random() * 0.1));
+                    if (randomCard.currentPrice < randomCard.baseValue * 0.2) randomCard.currentPrice = randomCard.baseValue * 0.2;
+                    updateMarketUIPrice(randomCard, 'down');
+
+                } else if (eventType < 0.9) {
+                    activeBot.netWorth += 5000;
+                    if(Math.random() < 0.08) {
+                         pushGlobalChat(activeBot.name, `UNBOXED A ${randomCard.name}! HOLY PULL!`, "text-accentRed font-black-custom");
+                    }
+                } else {
+                    pushGlobalChat(activeBot.name, `Forged new assets at the Fusion Lab.`, "text-accentPurple");
+                }
+            }
+
+            recalculateStats();
+        }
+
+        function updateMarketUIPrice(card, direction) {
+            const cardEls = document.querySelectorAll(`.trading-card[data-id="${card.id}"] .market-price-tag`);
+            cardEls.forEach(el => {
+                el.innerText = formatMoney(card.currentPrice);
+                const cardParent = el.closest('.trading-card');
+                if(cardParent) {
+                    cardParent.classList.remove('price-up', 'price-down');
+                    void cardParent.offsetWidth;
+                    cardParent.classList.add(direction === 'up' ? 'price-up' : 'price-down');
+                }
             });
         }
 
-        let activeTrade = null;
-        function viewTradeOffer(trade) {
-            activeTrade = trade;
-            document.getElementById('trade-placeholder').classList.add('hidden');
-            document.getElementById('trade-active-view').classList.remove('hidden');
+        setInterval(() => {
+            const now = Date.now();
+            const delta = (now - lastTick) / 1000;
+            lastTick = now;
 
-            const content = document.getElementById('trade-offer-content');
+            if (passiveIncome > 0) {
+                player.balance += passiveIncome * delta;
+                document.getElementById('ui-balance').innerText = formatMoney(player.balance);
+            }
+        }, 100);
+
+        setInterval(botEngineTick, 2500);
+
+        // --- 8. UI RENDERERS ---
+        function renderLeaderboard(playerNetWorth) {
+            const list = document.getElementById('leaderboard-list');
+            if(!list) return;
+            list.innerHTML = '';
             
-            const cardHtml = generateCardHTML(trade.card);
+            const allPlayers = [...bots, { name: player.name, level: player.level, netWorth: playerNetWorth, isPlayer: true }];
+            allPlayers.sort((a, b) => b.netWorth - a.netWorth);
 
-            content.innerHTML = `
-                <div class="bg-gray-100 p-4 brutal-border w-full flex items-center justify-between">
-                    <div>
-                        <div class="text-[10px] text-gray-500 font-bold uppercase">SELLER</div>
-                        <div class="font-black-custom text-xl">${trade.bot.name}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-[10px] text-gray-500 font-bold uppercase">ASKING PRICE</div>
-                        <div class="font-black-custom text-2xl text-accentRed">${formatMoney(trade.askingPrice)}</div>
-                    </div>
-                </div>
-
-                <div class="w-48 transform scale-125 my-4">
-                    ${cardHtml}
-                </div>
+            allPlayers.slice(0, 50).forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = `flex p-3 border-b-2 border-gray-300 font-bold text-sm ${p.isPlayer ? 'bg-accent/30 border-l-4 border-l-accent' : ''}`;
                 
-                <div class="bg-black text-white p-3 brutal-border w-full text-center text-xs font-bold uppercase">
-                    EST MARKET VALUE: ${formatMoney(trade.card.value)}
-                </div>
-            `;
+                let rankStr = `#${index + 1}`;
+                let rankColor = 'text-gray-600';
+                if (index === 0) rankColor = 'text-accentRed font-black-custom text-lg';
+                else if (index === 1) rankColor = 'text-orange-500 font-black-custom';
+                else if (index === 2) rankColor = 'text-yellow-500 font-black-custom';
 
-            document.getElementById('btn-accept-trade').onclick = () => {
-                if (gameState.balance >= trade.askingPrice) {
-                    gameState.balance -= trade.askingPrice;
-                    awardCard(trade.card);
-                    removeTrade(trade.id);
-                    showToast(`Trade successful! Acquired ${trade.card.name}.`, 'success');
-                    saveGame();
-                    updateAllUI();
-                    document.getElementById('trade-placeholder').classList.remove('hidden');
-                    document.getElementById('trade-active-view').classList.add('hidden');
-                } else {
-                    showToast("Insufficient funds for this trade.", "error");
-                }
-            };
-
-            document.getElementById('btn-decline-trade').onclick = () => {
-                removeTrade(trade.id);
-                showToast("Trade declined.");
-                document.getElementById('trade-placeholder').classList.remove('hidden');
-                document.getElementById('trade-active-view').classList.add('hidden');
-            };
+                div.innerHTML = `
+                    <div class="w-16 text-center ${rankColor}">${rankStr}</div>
+                    <div class="flex-1 flex items-center gap-2">
+                        ${p.name} ${p.isPlayer ? '<span class="bg-black text-white text-[9px] px-1 py-0.5 ml-2">YOU</span>' : ''}
+                    </div>
+                    <div class="w-20 text-center text-xs text-gray-500 hidden sm:block">Lv.${p.level}</div>
+                    <div class="w-32 text-right text-accentGreen font-black-custom">${formatMoney(p.netWorth)}</div>
+                `;
+                list.appendChild(div);
+            });
+            document.getElementById('dash-bots-count').innerText = bots.length;
         }
 
-        function removeTrade(id) {
-            gameState.inbox = gameState.inbox.filter(t => t.id !== id);
-            saveGame();
-            updateTradesBadge();
-            renderTradeInbox();
-        }
-
-
-        // -------------------------
-        // Core Mechanics
-        // -------------------------
-        function getPlayerIncome() {
-            let total = 0;
-            for (let id in gameState.cards) {
-                const cDef = CARD_DATABASE.find(c => c.id === id);
-                if (cDef) {
-                    // Formula: base income * qty * level multiplier
-                    total += cDef.income * gameState.cards[id].qty;
-                }
-            }
-            return total;
-        }
-
-        function getCollectionValue() {
-            let total = gameState.balance;
-            for (let id in gameState.cards) {
-                const cDef = CARD_DATABASE.find(c => c.id === id);
-                if (cDef) total += cDef.value * gameState.cards[id].qty;
-            }
-            return total;
-        }
-
-        function awardCard(cardDef) {
-            if(!gameState.cards[cardDef.id]) {
-                gameState.cards[cardDef.id] = { qty: 0, level: 1 };
-            }
-            gameState.cards[cardDef.id].qty += 1;
-            gameState.recentPulls.unshift(cardDef);
-            if(gameState.recentPulls.length > 6) gameState.recentPulls.pop();
-        }
-
-        // -------------------------
-        // Daily Bonus Fix (CRITICAL requirement)
-        // -------------------------
-        function setupDailyBonus() {
-            const btn = document.getElementById('btn-daily-bonus');
-            btn.addEventListener('click', claimDailyBonus);
-        }
-
-        function claimDailyBonus() {
-            const now = Date.now();
-            const ONE_DAY = 24 * 60 * 60 * 1000;
+        function switchScreen(targetId) {
+            document.querySelectorAll('.screen-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(targetId).classList.remove('hidden');
             
-            if (now - gameState.lastDaily >= ONE_DAY) {
-                // Scale bonus dynamically based on progression (Base $250 + 5% of net worth)
-                const baseReward = 250;
-                const scaledBonus = Math.floor(Math.min(getCollectionValue() * 0.05, 50000));
-                const reward = baseReward + scaledBonus;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const activeNav = document.querySelector(`[data-target="${targetId}"]`);
+            if(activeNav) activeNav.classList.add('active');
 
-                gameState.balance += reward;
-                gameState.lastDaily = now;
-                saveGame();
-                showToast(`Daily Bonus Claimed! +${formatMoney(reward)}`, 'success');
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                updateDailyTimer();
-            } else {
-                // Prevent infinite claim
-                showToast("Daily Bonus is recharging. Check back later!", 'error');
-            }
+            if (targetId === 'screen-market') renderMarket();
+            if (targetId === 'screen-collection') renderCollection();
+            if (targetId === 'screen-forge') renderForge();
+            if (targetId === 'screen-dashboard') renderDashboardRecent();
+            if (targetId === 'screen-arena') renderArena();
         }
 
-        function updateDailyTimer() {
-            const timerSpan = document.getElementById('daily-timer');
-            const now = Date.now();
-            const ONE_DAY = 24 * 60 * 60 * 1000;
-            const timePassed = now - gameState.lastDaily;
-            
-            if (timePassed >= ONE_DAY) {
-                timerSpan.classList.add('hidden');
-                document.getElementById('btn-daily-bonus').classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-                const timeLeft = ONE_DAY - timePassed;
-                const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
-                const mins = Math.floor((timeLeft / 1000 / 60) % 60);
-                timerSpan.innerText = `READY IN: ${hours}H ${mins}M`;
-                timerSpan.classList.remove('hidden');
-                document.getElementById('btn-daily-bonus').classList.add('opacity-50', 'cursor-not-allowed');
-            }
-        }
-
-        // -------------------------
-        // Crates System
-        // -------------------------
-        const CRATE_DEFS = [
-            { id: "basic", name: "BASIC CRATE", price: 200, desc: "Standard issue container. Mostly commons.", color: "bg-gray-300", weights: [70, 25, 5, 0, 0, 0, 0] },
-            { id: "rare", name: "RARE CACHE", price: 2500, desc: "Guaranteed uncommon or better.", color: "bg-rare", text: "text-white", weights: [0, 60, 30, 10, 0, 0, 0] },
-            { id: "epic", name: "EPIC VAULT", price: 35000, desc: "High-end corporate tech and bio-monsters.", color: "bg-epic", text: "text-white", weights: [0, 0, 40, 40, 20, 0, 0] },
-        ];
-
-        function renderCratesStore() {
-            const grid = document.getElementById('crates-grid');
+        function renderMarket() {
+            const grid = document.getElementById('market-grid');
             grid.innerHTML = '';
             
-            CRATE_DEFS.forEach(crate => {
-                grid.innerHTML += `
-                    <div class="brutal-box p-0 flex flex-col h-full bg-white">
-                        <div class="h-32 ${crate.color} ${crate.text || 'text-black'} border-b-4 border-black flex items-center justify-center relative overflow-hidden group">
-                            <i class="ph ph-package text-6xl transform group-hover:scale-110 transition-transform z-10"></i>
-                            <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        </div>
-                        <div class="p-4 flex flex-col flex-1">
-                            <h3 class="font-black-custom text-xl uppercase">${crate.name}</h3>
-                            <p class="text-xs font-bold text-gray-600 mt-1 flex-1">${crate.desc}</p>
-                            <button onclick="buyCrate('${crate.id}')" class="brutal-btn w-full py-2 bg-black text-white text-sm mt-4">
-                                BUY ${formatMoney(crate.price)}
-                            </button>
-                        </div>
-                    </div>
-                `;
+            const rarityFilter = document.getElementById('market-filter-rarity').value;
+            const categoryFilter = document.getElementById('market-filter-category').value;
+            const searchQuery = document.getElementById('global-search-input').value.toLowerCase().trim();
+            
+            Object.values(CARD_DB).forEach(card => {
+                if (rarityFilter !== 'all' && card.rarity !== rarityFilter) return;
+                if (categoryFilter !== 'all' && card.category !== categoryFilter) return;
+                if (searchQuery && !card.name.toLowerCase().includes(searchQuery) && !card.category.toLowerCase().includes(searchQuery)) return;
+
+                const cardEl = generateCardElement(card, 0, true);
+                cardEl.addEventListener('click', () => openTradeModal(card));
+                grid.appendChild(cardEl);
             });
 
-            document.getElementById('btn-buy-contraband').onclick = () => {
-                buyCrate('mythic');
-            };
+            populateFilterDropdowns();
         }
 
-        function buyCrate(type) {
-            let def, weights;
-            if (type === 'mythic') {
-                if (gameState.balance < 500000) return showToast("Insufficient funds!", "error");
-                gameState.balance -= 500000;
-                weights = [0, 0, 0, 30, 40, 25, 5]; // High chance for good stuff
-                openCrateVisual("MYTHIC CONTRABAND", weights, 'ph-skull');
+        function populateFilterDropdowns() {
+            const raritySelects = ['market-filter-rarity', 'collection-filter-rarity'];
+            raritySelects.forEach(id => {
+                const el = document.getElementById(id);
+                if(el && el.options.length <= 1) {
+                    Object.keys(RARITIES).forEach(key => {
+                        const opt = document.createElement('option');
+                        opt.value = key;
+                        opt.text = RARITIES[key].name;
+                        el.appendChild(opt);
+                    });
+                }
+            });
+
+            const categorySelects = ['market-filter-category', 'collection-filter-category'];
+            const categories = Array.from(new Set(RAW_CARD_DATABASE.map(c => c.category)));
+            categorySelects.forEach(id => {
+                const el = document.getElementById(id);
+                if(el && el.options.length <= 1) {
+                    categories.forEach(cat => {
+                        const opt = document.createElement('option');
+                        opt.value = cat;
+                        opt.text = cat.toUpperCase();
+                        el.appendChild(opt);
+                    });
+                }
+            });
+        }
+
+        function openTradeModal(card) {
+            const modal = document.getElementById('modal-trade');
+            const cardContainer = document.getElementById('trade-modal-card');
+            const priceTag = document.getElementById('trade-modal-price');
+            const ownedTag = document.getElementById('trade-modal-owned');
+            const btnBuy = document.getElementById('btn-modal-buy');
+            const btnSell = document.getElementById('btn-modal-sell');
+
+            modal.dataset.cardId = card.id;
+            cardContainer.innerHTML = '';
+            cardContainer.appendChild(generateCardElement(card));
+            
+            priceTag.innerText = formatMoney(card.currentPrice);
+            const owned = player.inventory[card.id] || 0;
+            ownedTag.innerText = owned;
+
+            btnBuy.classList.remove('hidden');
+            btnBuy.innerText = `BUY (${formatMoney(card.currentPrice)})`;
+            btnBuy.disabled = player.balance < card.currentPrice;
+
+            if (owned > 0) {
+                btnSell.classList.remove('hidden');
+                btnSell.innerText = `SELL (+${formatMoney(card.currentPrice)})`;
             } else {
-                def = CRATE_DEFS.find(c => c.id === type);
-                if (gameState.balance < def.price) return showToast("Insufficient funds!", "error");
-                gameState.balance -= def.price;
-                weights = def.weights;
-                openCrateVisual(def.name, weights, 'ph-package');
+                btnSell.classList.add('hidden');
             }
-            saveGame();
-            updateAllUI();
-        }
-
-        function openCrateVisual(title, weights, iconName) {
-            const modal = document.getElementById('modal-crate-open');
-            document.getElementById('crate-title').innerText = `DECRYPTING ${title}...`;
-            
-            const visual = document.getElementById('crate-visual');
-            visual.innerHTML = `<i class="ph ${iconName} text-8xl text-black transition-transform group-hover:scale-110"></i>
-                <div class="absolute -bottom-5 bg-black text-white font-black-custom text-sm px-4 py-1 brutal-border border-white shadow-[2px_2px_0_#fff]">TAP TO OPEN</div>`;
-            
-            document.getElementById('card-reveal-container').classList.add('hidden');
-            document.getElementById('reveal-info').classList.add('hidden');
-            visual.classList.remove('hidden');
 
             modal.classList.remove('hidden');
+        }
 
-            visual.onclick = () => {
-                visual.classList.add('hidden');
+        document.getElementById('btn-modal-buy').addEventListener('click', () => {
+            const modal = document.getElementById('modal-trade');
+            const card = getCard(modal.dataset.cardId);
+            if (player.balance >= card.currentPrice) {
+                player.balance -= card.currentPrice;
+                addCardToInventory(card.id);
+                gainXp(15);
+                card.currentPrice *= 1.05; 
                 
-                // Roll Card
-                const card = rollCard(weights);
-                awardCard(card);
-                saveGame();
-                updateAllUI();
-
-                // Show Card
-                const revContainer = document.getElementById('card-reveal-container');
-                revContainer.classList.remove('hidden');
-                document.getElementById('revealed-card').innerHTML = generateCardHTML(card);
-                
-                // Show Info
-                const info = document.getElementById('reveal-info');
-                info.classList.remove('hidden');
-                document.getElementById('reveal-name').innerText = card.name;
-                document.getElementById('reveal-rarity').innerText = card.rarity;
-                document.getElementById('reveal-rarity').className = `px-3 py-1 font-bold uppercase brutal-border shadow-brutal-sm text-white bg-${card.rarity === 'common'? 'gray-400' : card.rarity}`;
-                document.getElementById('reveal-cat').innerText = card.category;
-                document.getElementById('reveal-income').innerText = card.income;
-                
-                confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
-            };
-
-            document.getElementById('btn-continue-crate').onclick = () => {
-                modal.classList.add('hidden');
-                visual.onclick = null;
+                showToast(`Bought ${card.name}!`, 'success');
+                openTradeModal(card);
+                if(!document.getElementById('screen-market').classList.contains('hidden')) renderMarket();
+            } else {
+                showToast("INSUFFICIENT FUNDS", 'error');
             }
-        }
+        });
 
-        function rollCard(weights) {
-            const rarities = ["common", "uncommon", "rare", "epic", "legendary", "mythic", "voidTier"];
-            let roll = Math.random() * 100;
-            let sum = 0;
-            let pickedRarity = "common";
-            for(let i=0; i<weights.length; i++) {
-                sum += weights[i];
-                if (roll <= sum) {
-                    pickedRarity = rarities[i];
-                    break;
-                }
+        document.getElementById('btn-modal-sell').addEventListener('click', () => {
+            const modal = document.getElementById('modal-trade');
+            const card = getCard(modal.dataset.cardId);
+            if (player.inventory[card.id] > 0) {
+                player.inventory[card.id]--;
+                player.balance += card.currentPrice;
+                card.currentPrice *= 0.98;
+                
+                showToast(`Sold ${card.name}!`, 'success');
+                openTradeModal(card);
+                if(!document.getElementById('screen-market').classList.contains('hidden')) renderMarket();
             }
-            
-            const pool = CARD_DATABASE.filter(c => c.rarity === pickedRarity);
-            return pool[Math.floor(Math.random() * pool.length)];
-        }
+        });
 
-
-        // -------------------------
-        // Collection & Card HTML
-        // -------------------------
-        function generateCardHTML(cardDef, qty = 0, isFoil = false) {
-            return `
-                <div class="trading-card rarity-${cardDef.rarity} ${isFoil ? 'is-foil' : ''}">
-                    <div class="card-art-area">
-                        <i class="ph ${cardDef.icon} text-6xl text-black"></i>
-                    </div>
-                    <div class="bg-white p-2 flex-col flex h-[40%]">
-                        <div class="font-black-custom text-sm uppercase leading-tight truncate w-full" title="${cardDef.name}">${cardDef.name}</div>
-                        <div class="text-[10px] text-gray-500 font-bold uppercase mb-1">${cardDef.category}</div>
-                        
-                        <div class="mt-auto flex justify-between items-end">
-                            <div class="text-xs font-black-custom text-uncommon">+${cardDef.income}/s</div>
-                            ${qty > 0 ? `<div class="bg-black text-white text-[10px] font-bold px-1.5 py-0.5">x${qty}</div>` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
+        // --- COLLECTION ---
         function renderCollection() {
             const grid = document.getElementById('collection-grid');
             grid.innerHTML = '';
             
-            const filterRarity = document.getElementById('filter-rarity').value;
-            const filterCat = document.getElementById('filter-category').value;
-            const sort = document.getElementById('sort-cards').value;
-            const search = document.getElementById('global-search-input').value.toLowerCase();
-
-            let displayCards = [];
+            const filterEl = document.getElementById('collection-filter-rarity');
+            const categoryEl = document.getElementById('collection-filter-category');
+            const sortEl = document.getElementById('collection-sort');
             
-            for(let id in gameState.cards) {
-                const cDef = CARD_DATABASE.find(c => c.id === id);
-                if(cDef) {
-                    displayCards.push({ ...cDef, qty: gameState.cards[id].qty, level: gameState.cards[id].level });
-                }
+            const rarityFilter = filterEl ? filterEl.value : 'all';
+            const categoryFilter = categoryEl ? categoryEl.value : 'all';
+            const sortMethod = sortEl ? sortEl.value : 'value';
+
+            let ownedCards = [];
+            for (const [id, qty] of Object.entries(player.inventory)) {
+                if (qty > 0) ownedCards.push({ card: getCard(id), qty: qty });
             }
 
-            // Filters
-            if (filterRarity !== 'all') displayCards = displayCards.filter(c => c.rarity === filterRarity);
-            if (filterCat !== 'all') displayCards = displayCards.filter(c => c.category === filterCat);
-            if (search) displayCards = displayCards.filter(c => c.name.toLowerCase().includes(search));
+            if (rarityFilter !== 'all') {
+                ownedCards = ownedCards.filter(item => item.card.rarity === rarityFilter);
+            }
+            if (categoryFilter !== 'all') {
+                ownedCards = ownedCards.filter(item => item.card.category === categoryFilter);
+            }
 
-            // Sorting
-            displayCards.sort((a,b) => {
-                if (sort === 'income') return b.income - a.income;
-                if (sort === 'qty') return b.qty - a.qty;
-                if (sort === 'rarity') {
-                    const rOrder = { voidTier: 7, mythic: 6, legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 };
-                    return rOrder[b.rarity] - rOrder[a.rarity];
-                }
-                return a.id.localeCompare(b.id);
-            });
+            if (sortMethod === 'value') {
+                ownedCards.sort((a, b) => b.card.currentPrice - a.card.currentPrice);
+            } else if (sortMethod === 'income') {
+                ownedCards.sort((a, b) => b.card.baseIncome - a.card.baseIncome);
+            } else if (sortMethod === 'qty') {
+                ownedCards.sort((a, b) => b.qty - a.qty);
+            }
 
-            if(displayCards.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 font-black-custom mt-10">NO CARDS FOUND MATCHING FILTERS.</div>`;
+            if (ownedCards.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center p-10 font-black-custom text-gray-400 text-xl">NO CARDS FOUND IN CARDDEX. OPEN CRATES OR BUY FROM MARKET!</div>`;
                 return;
             }
 
-            displayCards.forEach(c => {
-                const wrapper = document.createElement('div');
-                wrapper.innerHTML = generateCardHTML(c, c.qty);
-                wrapper.onclick = () => openCardInspector(c);
-                grid.appendChild(wrapper);
-            });
-
-            // Update Dash Unique Count
-            document.getElementById('dash-unique').innerText = `${Object.keys(gameState.cards).length} / ${CARD_DATABASE.length}`;
-        }
-
-        function openCardInspector(card) {
-            const modal = document.getElementById('modal-card-inspector');
-            modal.classList.remove('hidden');
-            
-            document.getElementById('inspector-card-target').innerHTML = generateCardHTML(card, card.qty);
-            document.getElementById('inspect-title').innerText = card.name;
-            document.getElementById('inspect-id-badge').innerText = `ID: ${card.id}`;
-            document.getElementById('inspect-lore').innerText = `"${card.lore}"`;
-            document.getElementById('inspect-income').innerText = `+${card.income}/s`;
-            document.getElementById('inspect-value').innerText = formatMoney(card.value);
-            document.getElementById('inspect-qty').innerText = `x${card.qty}`;
-            document.getElementById('inspect-level').innerText = `LVL ${card.level}`;
-
-            const rarBadge = document.getElementById('inspect-rarity-badge');
-            rarBadge.innerText = card.rarity;
-            rarBadge.className = `font-black-custom px-3 py-1 text-sm uppercase brutal-border shadow-brutal-sm text-white bg-${card.rarity === 'common' ? 'gray-400' : card.rarity}`;
-
-            document.getElementById('btn-close-inspector').onclick = () => modal.classList.add('hidden');
-        }
-
-
-        // -------------------------
-        // UI & Navigation
-        // -------------------------
-        function setupNav() {
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const target = btn.getAttribute('data-target');
-                    switchTab(target);
-                });
+            ownedCards.forEach(item => {
+                grid.appendChild(generateCardElement(item.card, item.qty));
             });
         }
 
-        function switchTab(targetId) {
-            document.querySelectorAll('.screen-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(targetId).classList.remove('hidden');
-            const navBtn = document.querySelector(`.nav-item[data-target="${targetId}"]`);
-            if(navBtn) navBtn.classList.add('active');
-
-            if(targetId === 'screen-collection') renderCollection();
-            if(targetId === 'screen-trades') renderTradeInbox();
-            if(targetId === 'screen-leaderboard') updateLeaderboard();
-        }
-
-        function updateAllUI() {
-            document.getElementById('ui-balance').innerText = formatMoney(gameState.balance);
-            document.getElementById('ui-income').innerText = formatNumber(getPlayerIncome());
-            document.getElementById('dash-col-value').innerText = formatMoney(getCollectionValue());
-            
-            // Render Recent in Dash
-            const rGrid = document.getElementById('dash-recent-grid');
-            rGrid.innerHTML = '';
-            gameState.recentPulls.slice(0, 4).forEach(c => {
-                const el = document.createElement('div');
-                el.className = 'bg-gray-100 p-2 brutal-border flex items-center gap-2 cursor-pointer';
-                el.innerHTML = `<i class="ph ${c.icon} text-xl text-${c.rarity}"></i><div class="text-[10px] font-bold uppercase truncate">${c.name}</div>`;
-                el.onclick = () => openCardInspector({...c, qty: gameState.cards[c.id]?.qty || 0, level: gameState.cards[c.id]?.level || 1});
-                rGrid.appendChild(el);
-            });
-
-            updateTradesBadge();
-        }
-
-        function updateLeaderboard() {
-            const list = document.getElementById('leaderboard-list');
-            list.innerHTML = '';
-
-            let allEntities = [
-                { name: 'YOU (PLAYER)', value: getCollectionValue(), income: getPlayerIncome(), isPlayer: true },
-                ...bots.map(b => ({ name: b.name, value: b.balance, income: b.income, isPlayer: false }))
-            ];
-
-            allEntities.sort((a,b) => b.value - a.value);
-
-            allEntities.forEach((ent, index) => {
-                const row = document.createElement('div');
-                row.className = `flex p-3 border-b-2 border-black font-bold text-xs items-center ${ent.isPlayer ? 'bg-accent shadow-[inset_4px_0_0_#000]' : 'bg-white'}`;
-                
-                row.innerHTML = `
-                    <div class="w-16 text-center font-black-custom text-lg">${index + 1}</div>
-                    <div class="flex-1 pl-4 flex items-center gap-2">
-                        <i class="ph ${ent.isPlayer ? 'ph-user' : 'ph-robot'} text-xl"></i>
-                        <span class="uppercase">${ent.name}</span>
+        // --- DASHBOARD RECENT ---
+        function renderDashboardRecent() {
+            const grid = document.getElementById('dash-recent-grid');
+            grid.innerHTML = '';
+            if (player.recentAcquisitions.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-500 font-bold p-4">No recent acquisitions yet. Open crates or buy cards!</div>`;
+                return;
+            }
+            player.recentAcquisitions.forEach(id => {
+                const miniCard = document.createElement('div');
+                const c = getCard(id);
+                if(!c) return;
+                const r = RARITIES[c.rarity];
+                miniCard.className = `p-2 bg-white brutal-border shadow-brutal-sm flex items-center gap-2`;
+                miniCard.style.borderLeft = `6px solid ${r.hex}`;
+                miniCard.innerHTML = `
+                    <i class="ph ${c.icon} text-2xl"></i>
+                    <div class="overflow-hidden">
+                        <div class="font-black-custom text-xs truncate">${c.name}</div>
+                        <div class="text-[10px] font-bold" style="color:${r.hex}">${r.name}</div>
                     </div>
-                    <div class="w-40 text-right font-black-custom text-base">${formatMoney(ent.value)}</div>
-                    <div class="w-40 text-right text-uncommon">+${formatNumber(ent.income)}/s</div>
                 `;
-                list.appendChild(row);
+                grid.appendChild(miniCard);
             });
         }
 
-        // -------------------------
-        // Save / Load System
-        // -------------------------
-        function saveGame() {
-            localStorage.setItem('cardMarketSave', JSON.stringify(gameState));
+        // --- CRATE SYSTEM ---
+        function renderCrates() {
+            const grid = document.getElementById('crates-grid');
+            grid.innerHTML = '';
+            CRATES.forEach(crate => {
+                const div = document.createElement('div');
+                div.className = `brutal-box p-4 flex flex-col items-center text-center ${crate.color} relative overflow-hidden group cursor-pointer`;
+                div.innerHTML = `
+                    <div class="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-500 pointer-events-none"></div>
+                    <i class="ph ${crate.icon} text-6xl mb-2 drop-shadow-md transition-transform group-hover:scale-110"></i>
+                    <h3 class="font-black-custom text-xl uppercase">${crate.name}</h3>
+                    <p class="text-xs font-bold text-gray-700 mt-1 mb-4 flex-1">${crate.desc}</p>
+                    <button class="brutal-btn w-full py-3 bg-black text-white text-lg font-black-custom mt-auto hover:bg-accent hover:text-black transition-colors" onclick="buyCrate('${crate.id}')">
+                        BUY ${formatMoney(crate.price)}
+                    </button>
+                `;
+                grid.appendChild(div);
+            });
         }
 
-        function loadGame() {
-            const saved = localStorage.getItem('cardMarketSave');
-            if (saved) {
-                try {
-                    gameState = { ...gameState, ...JSON.parse(saved) };
-                    // Ensure nested objects exist if save is old
-                    if(!gameState.inbox) gameState.inbox = [];
-                    if(!gameState.recentPulls) gameState.recentPulls = [];
-                } catch(e) {
-                    console.error("Save load failed", e);
+        window.buyCrate = function(crateId) {
+            const crate = CRATES.find(c => c.id === crateId);
+            if (player.balance >= crate.price) {
+                player.balance -= crate.price;
+                recalculateStats();
+                startCrateOpening(crate);
+            } else {
+                showToast("INSUFFICIENT FUNDS FOR CRATE", "error");
+            }
+        };
+
+        function startCrateOpening(crate) {
+            const modal = document.getElementById('modal-crate-open');
+            const visual = document.getElementById('crate-visual');
+            const spinner = document.getElementById('spinner-container');
+            const revealContainer = document.getElementById('card-reveal-container');
+            const revealInfo = document.getElementById('reveal-info');
+            
+            modal.classList.remove('hidden');
+            visual.classList.remove('hidden');
+            spinner.classList.add('hidden');
+            revealContainer.classList.add('hidden');
+            revealInfo.classList.add('hidden');
+            
+            document.getElementById('crate-title').innerText = `DECRYPTING ${crate.name}...`;
+
+            visual.onclick = () => {
+                visual.classList.add('hidden');
+                runSpinnerAnimation(crate);
+            };
+        }
+
+        function getRandomCardFromWeights(weights) {
+            let totalWeight = 0;
+            for (let w of Object.values(weights)) totalWeight += w;
+            let random = Math.random() * totalWeight;
+            let currentWeight = 0;
+            let selectedRarity = 'common';
+            
+            for (const [rarity, weight] of Object.entries(weights)) {
+                currentWeight += weight;
+                if (random <= currentWeight) {
+                    selectedRarity = rarity;
+                    break;
                 }
+            }
+
+            const possibleCards = Object.values(CARD_DB).filter(c => c.rarity === selectedRarity);
+            if(possibleCards.length === 0) return Object.values(CARD_DB)[0];
+            return possibleCards[Math.floor(Math.random() * possibleCards.length)];
+        }
+
+        function runSpinnerAnimation(crate) {
+            const spinnerContainer = document.getElementById('spinner-container');
+            const track = document.getElementById('spinner-track');
+            spinnerContainer.classList.remove('hidden');
+            track.innerHTML = '';
+            track.style.transition = 'none';
+            track.style.transform = 'translateX(0)';
+
+            const numCards = 50;
+            const winnerIndex = 40;
+            const cardWidth = 148;
+            
+            let winnerCard = null;
+
+            for (let i = 0; i < numCards; i++) {
+                const card = getRandomCardFromWeights(crate.weights);
+                if (i === winnerIndex) winnerCard = card;
+                
+                const el = generateCardElement(card);
+                el.classList.add('spinner-card');
+                el.id = i === winnerIndex ? 'winner-card-el' : '';
+                track.appendChild(el);
+            }
+
+            void track.offsetWidth;
+
+            const containerWidth = spinnerContainer.offsetWidth;
+            const centerOffset = containerWidth / 2;
+            const winnerOffset = (winnerIndex * cardWidth) + (cardWidth / 2);
+            const randomVariance = (Math.random() * 60) - 30; 
+            const finalTransform = (winnerOffset - centerOffset + randomVariance) * -1;
+
+            track.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.15, 1)';
+            track.style.transform = `translateX(${finalTransform}px)`;
+
+            setTimeout(() => {
+                document.getElementById('winner-card-el').classList.add('winner');
+                setTimeout(() => {
+                    showReveal(winnerCard);
+                }, 1000);
+            }, 5000);
+        }
+
+        function showReveal(card) {
+            document.getElementById('spinner-container').classList.add('hidden');
+            const revealContainer = document.getElementById('card-reveal-container');
+            const revealInfo = document.getElementById('reveal-info');
+            const revealedCardDiv = document.getElementById('revealed-card');
+            
+            revealedCardDiv.innerHTML = '';
+            revealedCardDiv.appendChild(generateCardElement(card));
+            
+            revealContainer.classList.remove('hidden');
+            revealInfo.classList.remove('hidden');
+            revealInfo.classList.add('flex');
+
+            document.getElementById('reveal-name').innerText = card.name;
+            const raritySpan = document.getElementById('reveal-rarity');
+            raritySpan.innerText = RARITIES[card.rarity].name;
+            raritySpan.style.color = RARITIES[card.rarity].hex;
+            document.getElementById('reveal-income').innerText = formatMoney(card.baseIncome);
+
+            if(card.rarity === 'mythic' || card.rarity === 'voidTier') {
+                confetti({ particleCount: 150, spread: 180, origin: { y: 0.6 }, colors: ['#ff0000', '#00f0ff', '#ffcc00'] });
+                showToast(`!!! UNBOXED A ${RARITIES[card.rarity].name} !!!`, 'mythic');
+                pushGlobalChat(player.name, `JUST HIT A ${card.name} (${RARITIES[card.rarity].name})!!`, "text-accentRed font-black-custom");
+            } else if (card.rarity === 'legendary') {
+                confetti({ particleCount: 50, spread: 100, origin: { y: 0.6 }, colors: ['#ff9900'] });
+            }
+
+            addCardToInventory(card.id);
+            gainXp(50);
+        }
+
+        document.getElementById('btn-continue-crate').addEventListener('click', () => {
+            document.getElementById('modal-crate-open').classList.add('hidden');
+        });
+
+        // --- FORGE SYSTEM ---
+        function renderForge() {
+            const inventoryDiv = document.getElementById('forge-inventory');
+            inventoryDiv.innerHTML = '';
+            document.getElementById('forge-action-area').innerHTML = `<div class="text-center text-gray-400 font-black-custom text-xl">SELECT A CARD WITH 3+ COPIES TO FORGE</div>`;
+
+            let canForgeAny = false;
+            for (const [id, qty] of Object.entries(player.inventory)) {
+                if (qty >= 3) {
+                    const card = getCard(id);
+                    if (!card || card.rarity === 'voidTier') continue;
+
+                    canForgeAny = true;
+                    const el = generateCardElement(card, qty);
+                    el.classList.add('transform', 'scale-90', 'hover:scale-100');
+                    el.onclick = () => setupForgeAction(card);
+                    inventoryDiv.appendChild(el);
+                }
+            }
+
+            if(!canForgeAny) {
+                 inventoryDiv.innerHTML = `<div class="col-span-full text-center text-xs font-bold text-gray-500 mt-10">No cards available for fusion. You need 3 duplicate copies of the same card.</div>`;
             }
         }
 
-        // Run
-        window.onload = initGame;
+        function setupForgeAction(card) {
+            const area = document.getElementById('forge-action-area');
+            const targetRank = RARITIES[card.rarity].rank + 1;
+            let targetRarity = Object.keys(RARITIES).find(key => RARITIES[key].rank === targetRank);
+            
+            area.innerHTML = `
+                <div class="absolute inset-0 bg-accent/20 flex flex-col items-center justify-center p-6 z-10">
+                    <h3 class="font-black-custom text-2xl uppercase mb-6 text-center">FUSE 3x ${card.name}</h3>
+                    
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-20 h-28 opacity-70">${generateCardElement(card).outerHTML}</div>
+                        <i class="ph ph-plus text-2xl font-bold"></i>
+                        <div class="w-20 h-28 opacity-70">${generateCardElement(card).outerHTML}</div>
+                        <i class="ph ph-plus text-2xl font-bold"></i>
+                        <div class="w-20 h-28 opacity-70">${generateCardElement(card).outerHTML}</div>
+                    </div>
+                    
+                    <i class="ph ph-arrow-down text-4xl mb-8 animate-bounce"></i>
+                    
+                    <div class="brutal-box p-4 bg-white text-center border-dashed mb-6 w-full max-w-sm">
+                        <div class="font-black-custom text-lg">RESULT: RANDOM <span style="color:${RARITIES[targetRarity].hex}">${RARITIES[targetRarity].name}</span> CARD</div>
+                    </div>
+
+                    <button id="btn-execute-forge" class="brutal-btn px-10 py-4 text-2xl font-black-custom bg-accentRed text-white hover:bg-red-600">
+                        INITIATE FUSION
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('btn-execute-forge').onclick = () => {
+                if (player.inventory[card.id] >= 3) {
+                    player.inventory[card.id] -= 3;
+                    
+                    const possibleCards = Object.values(CARD_DB).filter(c => c.rarity === targetRarity);
+                    const resultCard = possibleCards[Math.floor(Math.random() * possibleCards.length)];
+                    
+                    addCardToInventory(resultCard.id);
+                    gainXp(150);
+                    
+                    showToast(`Fusion Successful! Crafted ${resultCard.name}!`, 'success');
+                    
+                    area.innerHTML += `<div class="absolute inset-0 bg-white z-50 transition-opacity duration-1000 opacity-100" id="flash-bang"></div>`;
+                    setTimeout(() => {
+                        const flash = document.getElementById('flash-bang');
+                        if(flash) flash.style.opacity = '0';
+                        setTimeout(renderForge, 1000);
+                    }, 100);
+                }
+            };
+        }
+
+        // --- BATTLE ARENA ---
+        function renderArena() {
+            const playerContainer = document.getElementById('arena-player-cards');
+            playerContainer.innerHTML = '';
+            
+            let owned = [];
+            for (const [id, qty] of Object.entries(player.inventory)) {
+                if (qty > 0) owned.push(getCard(id));
+            }
+            owned.sort((a,b) => b.baseIncome - a.baseIncome);
+            const squad = owned.slice(0,3);
+
+            let power = 0;
+            if (squad.length === 0) {
+                 playerContainer.innerHTML = `<div class="text-gray-400 font-bold text-sm">NO CARDS OWNED YET</div>`;
+            } else {
+                squad.forEach(card => {
+                    power += card.baseIncome;
+                    const el = generateCardElement(card);
+                    el.classList.add('transform', 'scale-90');
+                    playerContainer.appendChild(el);
+                });
+            }
+
+            document.getElementById('arena-player-power').innerText = formatMoney(power);
+
+            const oppContainer = document.getElementById('arena-bot-cards');
+            oppContainer.innerHTML = '';
+            const randomBot = bots[Math.floor(Math.random() * bots.length)];
+            document.getElementById('arena-opponent-name').innerText = randomBot.name;
+
+            let botPower = 0;
+            for(let i=0; i<3; i++) {
+                let cardKeys = Object.keys(CARD_DB);
+                let oppCard = getCard(cardKeys[Math.floor(Math.random() * cardKeys.length)]);
+                botPower += oppCard.baseIncome;
+
+                const el = generateCardElement(oppCard);
+                el.classList.add('transform', 'scale-90');
+                oppContainer.appendChild(el);
+            }
+            document.getElementById('arena-bot-power').innerText = "?";
+
+            const btn = document.getElementById('btn-arena-fight');
+            btn.onclick = () => {
+                if (player.balance >= 1000) {
+                    player.balance -= 1000;
+                    recalculateStats();
+                    
+                    document.getElementById('arena-bot-power').innerText = formatMoney(botPower);
+                    const log = document.getElementById('arena-battle-log');
+                    log.classList.remove('hidden');
+                    btn.disabled = true;
+
+                    let tick = 0;
+                    const combatInt = setInterval(() => {
+                        tick++;
+                        if(tick % 2 === 0) {
+                            playerContainer.classList.add('-translate-y-4');
+                            oppContainer.classList.remove('-translate-y-4');
+                        } else {
+                            oppContainer.classList.add('-translate-y-4');
+                            playerContainer.classList.remove('-translate-y-4');
+                        }
+
+                        if(tick > 6) {
+                            clearInterval(combatInt);
+                            playerContainer.classList.remove('-translate-y-4');
+                            oppContainer.classList.remove('-translate-y-4');
+                            
+                            if (power >= botPower) {
+                                log.innerText = "VICTORY! SQUAD DOMINATED!";
+                                log.className = "text-xl font-black-custom bg-accentGreen text-black px-6 py-3 brutal-border border-black absolute top-4 z-20 shadow-brutal";
+                                player.crystals += 50;
+                                gainXp(200);
+                                document.getElementById('ui-crystals').innerText = `${player.crystals} 💎`;
+                                pushGlobalChat("SYSTEM", `${player.name} defeated ${randomBot.name} in the Arena!`, "text-accentGreen");
+                            } else {
+                                log.innerText = "DEFEAT! SQUAD WIPED OUT.";
+                                log.className = "text-xl font-black-custom bg-accentRed text-white px-6 py-3 brutal-border border-black absolute top-4 z-20 shadow-brutal";
+                            }
+
+                            setTimeout(() => {
+                                log.classList.add('hidden');
+                                log.className = "text-xs font-black-custom bg-black text-white px-4 py-2 brutal-border border-white hidden z-20 absolute top-4";
+                                btn.disabled = false;
+                                renderArena();
+                            }, 3000);
+                        }
+                    }, 300);
+                } else {
+                    showToast("Need $1,000 for Entry Fee!", "error");
+                }
+            };
+        }
+
+        // --- LIVE AUCTION ---
+        function runAuctionSystem() {
+            if (currentAuction.active) return;
+            
+            setTimeout(() => {
+                startAuction();
+            }, Math.random() * 15000 + 15000);
+        }
+
+        function startAuction() {
+            currentAuction.active = true;
+            currentAuction.timer = 30;
+            
+            const keys = Object.keys(CARD_DB);
+            let validCards = keys.map(k=>getCard(k)).filter(c => c.rarity !== 'common' && c.rarity !== 'uncommon');
+            currentAuction.card = validCards[Math.floor(Math.random() * validCards.length)];
+            currentAuction.currentBid = Math.floor(currentAuction.card.baseValue * 0.5);
+            currentAuction.highestBidder = null;
+
+            document.getElementById('auction-card-container').innerHTML = '';
+            document.getElementById('auction-card-container').appendChild(generateCardElement(currentAuction.card));
+            document.getElementById('auction-log').innerHTML = '';
+            updateAuctionUI();
+            pushAuctionLog(`Auction started for ${currentAuction.card.name}! Starting bid: ${formatMoney(currentAuction.currentBid)}`);
+
+            document.getElementById('btn-place-bid').onclick = () => {
+                const requiredBid = Math.floor(currentAuction.currentBid * 1.1);
+                if (player.balance >= requiredBid) {
+                    player.balance -= requiredBid;
+                    currentAuction.currentBid = requiredBid;
+                    currentAuction.highestBidder = 'YOU';
+                    currentAuction.timer += 5;
+                    recalculateStats();
+                    updateAuctionUI();
+                    pushAuctionLog(`YOU bid ${formatMoney(requiredBid)}!`);
+                } else {
+                    showToast("INSUFFICIENT FUNDS TO BID", "error");
+                }
+            };
+
+            currentAuction.interval = setInterval(() => {
+                currentAuction.timer--;
+                
+                if (currentAuction.timer > 0 && Math.random() < 0.25 && currentAuction.highestBidder !== 'YOU') {
+                    const randomBot = bots[Math.floor(Math.random() * bots.length)];
+                    const requiredBid = Math.floor(currentAuction.currentBid * 1.1);
+                    
+                    if (requiredBid < currentAuction.card.baseValue * 2) {
+                        currentAuction.currentBid = requiredBid;
+                        currentAuction.highestBidder = randomBot.name;
+                        currentAuction.timer += 3;
+                        updateAuctionUI();
+                        pushAuctionLog(`${randomBot.name} bid ${formatMoney(requiredBid)}!`);
+                    }
+                } else if (currentAuction.timer > 0 && currentAuction.highestBidder === 'YOU' && Math.random() < 0.2) {
+                    const randomBot = bots[Math.floor(Math.random() * bots.length)];
+                    const requiredBid = Math.floor(currentAuction.currentBid * 1.1);
+                    if (requiredBid < currentAuction.card.baseValue * 1.6) {
+                        currentAuction.currentBid = requiredBid;
+                        currentAuction.highestBidder = randomBot.name;
+                        currentAuction.timer += 4;
+                        updateAuctionUI();
+                        pushAuctionLog(`${randomBot.name} outbid you with ${formatMoney(requiredBid)}!`);
+                        showToast(`Outbid by ${randomBot.name}!`, "error");
+                    }
+                }
+
+                if (currentAuction.timer <= 0) {
+                    endAuction();
+                } else {
+                    document.getElementById('auction-timer-display').innerText = `${currentAuction.timer}s`;
+                }
+            }, 1000);
+        }
+
+        function updateAuctionUI() {
+            document.getElementById('auction-current-bid').innerText = formatMoney(currentAuction.currentBid);
+            document.getElementById('auction-highest-bidder').innerText = currentAuction.highestBidder ? `HIGHEST: ${currentAuction.highestBidder}` : "NO BIDS YET";
+            
+            const btn = document.getElementById('btn-place-bid');
+            if (currentAuction.highestBidder === 'YOU') {
+                btn.disabled = true;
+                btn.innerText = "WINNING!";
+                btn.className = "brutal-btn w-full py-2 sm:py-4 bg-accentGreen text-black text-lg sm:text-xl font-black-custom";
+            } else {
+                btn.disabled = false;
+                btn.innerText = `PLACE BID (${formatMoney(Math.floor(currentAuction.currentBid * 1.1))})`;
+                btn.className = "brutal-btn w-full py-2 sm:py-4 bg-accent text-black text-lg sm:text-xl font-black-custom";
+            }
+        }
+
+        function pushAuctionLog(msg) {
+            const log = document.getElementById('auction-log');
+            const entry = document.createElement('div');
+            entry.className = "p-2 bg-white border-b-2 border-gray-200";
+            entry.innerText = msg;
+            log.prepend(entry);
+        }
+
+        function endAuction() {
+            clearInterval(currentAuction.interval);
+            currentAuction.active = false;
+            
+            if (currentAuction.highestBidder === 'YOU') {
+                pushAuctionLog("AUCTION WON! Card added to Collection.");
+                showToast(`Won Auction for ${currentAuction.card.name}!`, "success");
+                addCardToInventory(currentAuction.card.id);
+            } else if (currentAuction.highestBidder) {
+                pushAuctionLog(`Auction won by ${currentAuction.highestBidder}.`);
+            } else {
+                pushAuctionLog("Auction ended with no bids.");
+            }
+
+            document.getElementById('auction-timer-display').innerText = "ENDED";
+            document.getElementById('btn-place-bid').disabled = true;
+            document.getElementById('btn-place-bid').innerText = "WAITING...";
+            
+            runAuctionSystem();
+        }
+
+        // --- INITIALIZATION ---
+        function init() {
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    switchScreen(e.currentTarget.dataset.target);
+                });
+            });
+
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.currentTarget.parentElement.parentElement.classList.add('hidden');
+                });
+            });
+
+            const globalSearch = document.getElementById('global-search-input');
+            if(globalSearch) {
+                globalSearch.addEventListener('input', () => {
+                    if(!document.getElementById('screen-market').classList.contains('hidden')) renderMarket();
+                });
+            }
+
+            const marketRarity = document.getElementById('market-filter-rarity');
+            const marketCategory = document.getElementById('market-filter-category');
+            if(marketRarity) marketRarity.addEventListener('change', renderMarket);
+            if(marketCategory) marketCategory.addEventListener('change', renderMarket);
+            
+            ['collection-filter-rarity', 'collection-filter-category', 'collection-sort'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.addEventListener('change', renderCollection);
+            });
+
+            const btnDaily = document.getElementById('btn-daily-bonus');
+            if(btnDaily) {
+                btnDaily.addEventListener('click', () => {
+                    if(!btnDaily.disabled) {
+                        btnDaily.disabled = true;
+                        document.getElementById('spin-icon').classList.add('spin-anim');
+                        document.getElementById('daily-spin-text').innerText = "SPINNING...";
+                        
+                        setTimeout(() => {
+                            const reward = Math.floor(Math.random() * 5000) + 2000;
+                            player.balance += reward;
+                            showToast(`Daily Spin: Won ${formatMoney(reward)}!`, 'success');
+                            recalculateStats();
+                            document.getElementById('spin-icon').classList.remove('spin-anim');
+                            document.getElementById('daily-spin-text').innerText = "CLAIMED FOR TODAY";
+                        }, 2000);
+                    }
+                });
+            }
+
+            const btnVault = document.getElementById('btn-claim-vault');
+            if(btnVault) {
+                btnVault.addEventListener('click', () => {
+                    if(passiveIncome > 0) {
+                        showToast("Vault claimed! Yield secured.", "success");
+                    } else {
+                        showToast("No passive yield to claim.", "error");
+                    }
+                });
+            }
+
+            renderCrates();
+            renderMarket();
+            switchScreen('screen-dashboard');
+            recalculateStats();
+            runAuctionSystem();
+            
+            setTimeout(() => {
+                pushGlobalChat("SYSTEM", "CARD//MARKET v2.2 live with 60+ unique cards! Generating starter pack...", "text-accentGreen");
+                setTimeout(() => {
+                    addCardToInventory("C-01");
+                    addCardToInventory("C-03");
+                    addCardToInventory("U-01");
+                    showToast("Starter booster cards added to your CardDex!");
+                }, 1500);
+            }, 1000);
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

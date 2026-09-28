@@ -304,11 +304,11 @@
 
         <aside class="w-64 bg-white brutal-border border-t-0 border-l-0 flex flex-col z-20 h-full shrink-0 shadow-[4px_0_0_rgba(0,0,0,1)] relative">
             <div class="p-3 brutal-border border-l-0 border-r-0 border-t-0 bg-gray-100 flex items-center gap-3">
-                <div class="w-10 h-10 bg-accent brutal-border shadow-brutal-sm flex items-center justify-center text-xl font-bold" id="ui-avatar">
+                <div class="w-10 h-10 bg-accent brutal-border shadow-brutal-sm flex items-center justify-center text-xl font-bold cursor-pointer" id="ui-avatar-container" title="Click to change username">
                     <i class="ph ph-user-gear"></i>
                 </div>
                 <div class="overflow-hidden">
-                    <div class="font-black-custom text-sm uppercase tracking-tighter truncate" id="ui-player-name">TRADER_01</div>
+                    <div class="font-black-custom text-sm uppercase tracking-tighter truncate cursor-pointer" id="ui-player-name" title="Click to change username">TRADER_01</div>
                     <div class="text-[9px] font-bold bg-black text-white px-2 py-0.5 inline-block">LVL <span id="ui-player-level">1</span> MOGUL</div>
                 </div>
             </div>
@@ -351,7 +351,6 @@
 
         <main class="flex-1 flex flex-col h-full relative z-10 p-4 sm:p-6 overflow-y-auto">
             
-            <!-- Dashboard -->
             <div id="screen-dashboard" class="screen-content h-full flex flex-col gap-6">
                 <div class="flex items-center justify-between flex-wrap gap-4">
                     <div class="flex items-center relative">
@@ -434,7 +433,6 @@
                 </div>
             </div>
 
-            <!-- Open Market -->
             <div id="screen-market" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6 overflow-hidden">
                 <div class="flex flex-wrap items-center justify-between border-b-4 border-black pb-4 mb-4 gap-4">
                     <div>
@@ -472,7 +470,6 @@
                 </div>
             </div>
 
-            <!-- Crates Screen -->
             <div id="screen-crates" class="screen-content hidden h-full flex flex-col relative z-10">
                 <div class="flex justify-between items-end mb-4 bg-white p-5 brutal-box">
                     <div>
@@ -485,7 +482,6 @@
                 </div>
             </div>
 
-            <!-- Collection Screen -->
             <div id="screen-collection" class="screen-content hidden h-full flex flex-col relative z-10 bg-white/95 brutal-box p-5 overflow-hidden">
                 <div class="flex flex-wrap gap-3 items-center justify-between mb-4 pb-3 border-b-4 border-black shrink-0">
                     <div>
@@ -513,7 +509,6 @@
                 </div>
             </div>
 
-            <!-- Forge Screen -->
             <div id="screen-forge" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6">
                 <div class="flex justify-between items-center border-b-4 border-black pb-4 mb-4 shrink-0">
                     <div>
@@ -537,7 +532,6 @@
                 </div>
             </div>
 
-            <!-- Battle Arena Screen -->
             <div id="screen-arena" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6">
                 <div class="flex flex-wrap gap-4 justify-between items-center border-b-4 border-black pb-4 mb-4 shrink-0">
                     <div>
@@ -580,7 +574,6 @@
                 </div>
             </div>
 
-            <!-- Auction Screen -->
             <div id="screen-auction" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6">
                 <div class="flex justify-between items-center border-b-4 border-black pb-4 mb-4 shrink-0">
                     <div>
@@ -618,7 +611,6 @@
                 </div>
             </div>
 
-            <!-- Leaderboard -->
             <div id="screen-leaderboard" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-0">
                 <div class="p-4 bg-black text-white border-b-4 border-black flex justify-between items-center shrink-0">
                     <div>
@@ -822,6 +814,19 @@
         </div>
     </div>
 
+    <!-- USERNAME MODAL -->
+    <div id="modal-username" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[130] hidden flex items-center justify-center p-4">
+        <div class="brutal-box p-6 bg-white max-w-md w-full relative">
+            <button class="absolute top-2 right-2 text-xl font-black hover:text-accentRed close-username-modal">X</button>
+            <h2 class="font-black-custom text-2xl uppercase mb-4 border-b-4 border-black pb-2 flex items-center gap-2">
+                <i class="ph ph-user-gear text-accent"></i> SET UNIQUE TRADER ID
+            </h2>
+            <p class="text-xs font-bold text-gray-600 mb-3">Establish your identity on the global market leaderboard.</p>
+            <input type="text" id="username-input" class="brutal-input w-full mb-4 text-center font-black-custom text-xl uppercase" placeholder="ENTER TRADER ID" maxlength="15">
+            <button id="btn-save-username" class="brutal-btn w-full py-3 bg-accent text-black font-black-custom">CONFIRM ID</button>
+        </div>
+    </div>
+
     <div id="notification-container" class="fixed bottom-4 right-4 flex flex-col gap-2 z-[9999]"></div>
 
     <script type="module">
@@ -944,14 +949,14 @@
             arenaWins: 0,
             lastDailySpin: 0,
             vaultClaimed: 0,
-            playerName: "TRADER_01",
+            playerName: "TRADER_" + Math.floor(Math.random() * 9999).toString().padStart(4, '0'),
             createdAt: Date.now()
         };
 
         let rawState = { ...DEFAULT_STATE };
         let shadowHash = ""; // Shadow integrity checksum hash
 
-        // --- ANTI-HACK SENTINEL IMPLEMENTATION ---
+        // --- STREAMING_CHUNK:Configuring the Anti-Hack Sentinel... ---
         const AntiHack = {
             violationsCount: 0,
             lastVerifiedBalance: 500,
@@ -1056,13 +1061,14 @@
                 target[property] = value;
                 
                 // Keep UI updated on change
-                if (property === 'balance' || property === 'crystals' || property === 'xp') {
+                if (property === 'balance' || property === 'crystals' || property === 'xp' || property === 'playerName') {
                     updateUI();
                 }
                 return true;
             }
         });
 
+        // --- STREAMING_CHUNK:Implementing the Save System... ---
         const SaveSystem = {
             STORAGE_KEY: "CARD_MARKET_SAVE_v2_2",
 
@@ -1175,6 +1181,8 @@
             resetGame() {
                 localStorage.removeItem(this.STORAGE_KEY);
                 Object.assign(rawState, DEFAULT_STATE);
+                // Ensure a random name is generated on reset if it was missing
+                rawState.playerName = "TRADER_" + Math.floor(Math.random() * 9999).toString().padStart(4, '0');
                 AntiHack.lastVerifiedBalance = state.balance;
                 AntiHack.lastVerifiedCrystals = state.crystals;
                 this.saveGame(false);
@@ -1185,21 +1193,40 @@
             }
         };
 
-        // --- BOT TRADERS FOR MULTIPLAYER SIMULATION ---
-        const BOTS = [
-            { name: "CYBER_WHALE_99", avatar: "ph-robot", networth: 45000000, level: 45 },
-            { name: "NEON_TRADER_X", avatar: "ph-lightning", networth: 18500000, level: 32 },
-            { name: "VOID_COLLECTOR", avatar: "ph-alien", networth: 9200000, level: 28 },
-            { name: "QUANTUM_HACKER", avatar: "ph-terminal-window", networth: 4100000, level: 19 },
-            { name: "MECHA_PILOT_01", avatar: "ph-sword", networth: 1200000, level: 12 }
-        ];
+        // --- STREAMING_CHUNK:Generating 30 Bot Traders... ---
+        const BOT_NAMES = ["CYBER_WHALE", "NEON_TRADER", "VOID_COLLECTOR", "QUANTUM_HACKER", "MECHA_PILOT", "CREDIT_KING", "HOLO_BARON", "DATA_SMUGGLER", "SYNTH_LORD", "ZERO_DAY", "GLITCH_FINDER", "OVERCLOCKER", "PROXY_SHIELD", "NET_RUNNER", "FUTURES_ORACLE"];
+        const BOT_AVATARS = ["ph-robot", "ph-lightning", "ph-alien", "ph-terminal-window", "ph-sword", "ph-currency-dollar", "ph-eye", "ph-bug", "ph-cpu", "ph-fingerprint"];
+        
+        function generateBots(count) {
+            const generated = [];
+            for (let i = 0; i < count; i++) {
+                const baseName = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
+                const suffix = Math.floor(Math.random() * 999).toString().padStart(3, '0');
+                const name = `${baseName}_${suffix}`;
+                
+                // Exponential-ish distribution for networth to simulate whales and plebs
+                const isWhale = Math.random() > 0.85;
+                const baseNetworth = isWhale ? 10000000 : 100000;
+                const multiplier = isWhale ? Math.random() * 5 : Math.random() * 10;
+                const networth = baseNetworth + (baseNetworth * multiplier);
+                
+                const level = Math.floor(Math.random() * (isWhale ? 50 : 20)) + 1;
+                const avatar = BOT_AVATARS[Math.floor(Math.random() * BOT_AVATARS.length)];
+
+                generated.push({ name, avatar, networth, level });
+            }
+            // Sort by networth to keep consistent ordering initially
+            return generated.sort((a, b) => b.networth - a.networth);
+        }
+
+        const BOTS = generateBots(30);
 
         // --- ACTIVE AUCTION STATE ---
         let currentAuction = null;
         let auctionTimer = 30;
         let auctionInterval = null;
 
-        // --- HELPER FUNCTIONS ---
+        // --- STREAMING_CHUNK:Defining core utility functions... ---
         function calculateTotalIncome() {
             let total = 0;
             for (const [cardId, qty] of Object.entries(state.inventory)) {
@@ -1284,6 +1311,7 @@
             return div;
         }
 
+        // --- STREAMING_CHUNK:Implementing UI rendering functions... ---
         function updateUI() {
             document.getElementById('ui-balance').innerText = `$${state.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             document.getElementById('ui-crystals').innerText = `${state.crystals} 💎`;
@@ -1294,6 +1322,9 @@
             document.getElementById('ui-player-level').innerText = state.level;
             document.getElementById('ui-xp-text').innerText = `${state.xp} / ${state.level * 500}`;
             document.getElementById('ui-xp-bar').style.width = `${Math.min(100, (state.xp / (state.level * 500)) * 100)}%`;
+            
+            // Update Username
+            document.getElementById('ui-player-name').innerText = state.playerName;
 
             // Dashboard Metrics
             document.getElementById('dash-col-value').innerText = `$${calculateNetWorth().toLocaleString(undefined, {maximumFractionDigits:0})}`;
@@ -1386,7 +1417,7 @@
             });
         }
 
-        // --- CRATE UNBOXING SPINNER ANIMATION ---
+        // --- STREAMING_CHUNK:Implementing Crate Unboxing logic... ---
         function openCrateModal(crate) {
             const cost = crate.cost;
             if (crate.currency === 'crystals') {
@@ -1481,8 +1512,15 @@
                 SaveSystem.saveGame(true);
             }, 5500);
         }
+        
+        // Fix for Accept Asset button
+        document.getElementById('btn-continue-crate').addEventListener('click', () => {
+            document.getElementById('modal-crate-open').classList.add('hidden');
+            renderCollection();
+            updateUI(); // Ensure dashboard recent pulls or counts update
+        });
 
-        // --- TRADE MODAL LOGIC ---
+        // --- STREAMING_CHUNK:Implementing Trading and Forge logic... ---
         let selectedTradeCard = null;
         function openTradeModal(card) {
             selectedTradeCard = card;
@@ -1614,6 +1652,7 @@
             };
         }
 
+        // --- STREAMING_CHUNK:Implementing Arena and Auction logic... ---
         function renderArena() {
             const playerCardsDiv = document.getElementById('arena-player-cards');
             if (!playerCardsDiv) return;
@@ -1738,12 +1777,20 @@
             log.prepend(entry);
         };
 
+        // --- STREAMING_CHUNK:Implementing Leaderboard and Game Loop... ---
         function renderLeaderboard() {
             const list = document.getElementById('leaderboard-list');
             if (!list) return;
             list.innerHTML = '';
 
             const userEntry = { name: `${state.playerName} (YOU)`, networth: calculateNetWorth(), level: state.level, isUser: true };
+            
+            // Periodically increase bot networth to simulate gameplay
+            if(Math.random() > 0.5) {
+                const randomBotIndex = Math.floor(Math.random() * BOTS.length);
+                BOTS[randomBotIndex].networth *= (1 + (Math.random() * 0.05));
+            }
+
             const allTraders = [...BOTS, userEntry].sort((a, b) => b.networth - a.networth);
 
             allTraders.forEach((t, rank) => {
@@ -1761,203 +1808,262 @@
                 list.appendChild(row);
             });
         }
+        
+        // --- Username Modal Logic ---
+        function setupUsernameModal() {
+            const nameElements = [document.getElementById('ui-player-name'), document.getElementById('ui-avatar-container')];
+            const modal = document.getElementById('modal-username');
+            const input = document.getElementById('username-input');
+            const btnSave = document.getElementById('btn-save-username');
+            const btnClose = document.querySelector('.close-username-modal');
 
-        function setupNavigation() {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    navItems.forEach(n => n.classList.remove('active'));
-                    item.classList.add('active');
-
-                    const target = item.getAttribute('data-target');
-                    document.querySelectorAll('.screen-content').forEach(s => s.classList.add('hidden'));
-                    
-                    const activeScreen = document.getElementById(target);
-                    if (activeScreen) activeScreen.classList.remove('hidden');
-
-                    if (target === 'screen-market') renderMarket();
-                    if (target === 'screen-collection') renderCollection();
-                    if (target === 'screen-crates') renderCrates();
-                    if (target === 'screen-forge') renderForge();
-                    if (target === 'screen-arena') renderArena();
-                    if (target === 'screen-auction' && !currentAuction) startAuctionLoop();
-                    if (target === 'screen-leaderboard') renderLeaderboard();
-                });
-            });
-
-            // Populate Filter Select Options
-            const raritySelects = [document.getElementById('market-filter-rarity'), document.getElementById('collection-filter-rarity')];
-            raritySelects.forEach(sel => {
-                if (!sel) return;
-                Object.entries(RARITIES).forEach(([key, info]) => {
-                    const opt = document.createElement('option');
-                    opt.value = key;
-                    opt.innerText = info.name;
-                    sel.appendChild(opt);
-                });
-                sel.onchange = () => { renderMarket(); renderCollection(); };
-            });
-
-            const catSelects = [document.getElementById('market-filter-category'), document.getElementById('collection-filter-category')];
-            const categories = Array.from(new Set(RAW_CARD_DATABASE.map(c => c.category)));
-            catSelects.forEach(sel => {
-                if (!sel) return;
-                categories.forEach(cat => {
-                    const opt = document.createElement('option');
-                    opt.value = cat;
-                    opt.innerText = cat.toUpperCase();
-                    sel.appendChild(opt);
-                });
-                sel.onchange = () => { renderMarket(); renderCollection(); };
-            });
-
-            document.getElementById('global-search-input').oninput = () => renderMarket();
-
-            // Modals close buttons
-            document.querySelectorAll('.close-modal').forEach(btn => {
-                btn.onclick = () => document.getElementById('modal-trade').classList.add('hidden');
-            });
-            document.querySelectorAll('.close-save-modal').forEach(btn => {
-                btn.onclick = () => document.getElementById('modal-save-io').classList.add('hidden');
-            });
-
-            // --- COMPLETED REST OF YOUR CUT-OFF FILE CODE BELOW ---
-            const btnSecSave = document.getElementById('btn-sec-save-now');
-            if(btnSecSave) btnSecSave.onclick = () => SaveSystem.saveGame(false);
-            
-            const btnSecExport = document.getElementById('btn-sec-export');
-            if(btnSecExport) btnSecExport.onclick = () => {
-                document.getElementById('save-io-textarea').value = SaveSystem.exportSaveString();
-                document.getElementById('save-io-title').innerText = "EXPORT SAVE DATA";
-                document.getElementById('modal-save-io').classList.remove('hidden');
-            };
-            
-            const btnSecImport = document.getElementById('btn-sec-import');
-            if(btnSecImport) btnSecImport.onclick = () => {
-                document.getElementById('save-io-textarea').value = "";
-                document.getElementById('save-io-title').innerText = "IMPORT SAVE DATA";
-                document.getElementById('modal-save-io').classList.remove('hidden');
-            };
-
-            const btnSaveAction = document.getElementById('btn-save-io-action');
-            if(btnSaveAction) btnSaveAction.onclick = () => {
-                const title = document.getElementById('save-io-title').innerText;
-                if (title.includes("EXPORT")) {
-                    navigator.clipboard.writeText(document.getElementById('save-io-textarea').value);
-                    showToast("Save code copied to clipboard!", "success");
-                } else {
-                    SaveSystem.importSaveString(document.getElementById('save-io-textarea').value);
-                    document.getElementById('modal-save-io').classList.add('hidden');
+            nameElements.forEach(el => {
+                if(el) {
+                    el.addEventListener('click', () => {
+                        input.value = state.playerName;
+                        modal.classList.remove('hidden');
+                    });
                 }
-            };
+            });
 
-            const btnReset = document.getElementById('btn-sec-reset');
-            if(btnReset) btnReset.onclick = () => {
-                if(confirm("WARNING: This permanently wipes all data. Continue?")) SaveSystem.resetGame();
-            };
+            btnClose.addEventListener('click', () => modal.classList.add('hidden'));
 
-            const btnRevert = document.getElementById('btn-anti-hack-revert');
-            if(btnRevert) btnRevert.onclick = () => {
-                document.getElementById('modal-anti-hack-alert').classList.add('hidden');
-                SaveSystem.loadGame();
-                showToast("Reverted to last secure state.", "info");
-            };
-
-            const btnPurge = document.getElementById('btn-anti-hack-purge');
-            if(btnPurge) btnPurge.onclick = () => {
-                document.getElementById('modal-anti-hack-alert').classList.add('hidden');
-                AntiHack.sanitizeValues(rawState);
+            btnSave.addEventListener('click', () => {
+                const newName = input.value.trim().toUpperCase();
+                if (newName.length < 3) {
+                    showToast("ID must be at least 3 characters", "error");
+                    return;
+                }
+                state.playerName = newName;
+                modal.classList.add('hidden');
+                showToast("Trader ID updated successfully!", "success");
                 SaveSystem.saveGame(true);
-                showToast("Tampered values purged.", "info");
-            };
-            
-            const btnQuickSave = document.getElementById('btn-quick-save');
-            if(btnQuickSave) btnQuickSave.onclick = () => SaveSystem.saveGame(false);
-            
-            const btnClaimVault = document.getElementById('btn-claim-vault');
-            if(btnClaimVault) btnClaimVault.onclick = () => showToast("Vault is currently locked.", "error");
+                renderLeaderboard();
+            });
+        }
 
-            const btnDailyBonus = document.getElementById('btn-daily-bonus');
-            if(btnDailyBonus) {
-                btnDailyBonus.onclick = () => {
-                    const now = Date.now();
-                    if (now - state.lastDailySpin < 86400000) {
-                        showToast("Daily spin not ready yet!", "error");
-                        return;
+        function gameLoop() {
+            setInterval(() => {
+                const income = calculateTotalIncome();
+                if (income > 0) {
+                    state.balance += income;
+                }
+                
+                // Simulate market volatility
+                Object.values(CARDS).forEach(card => {
+                    if (Math.random() < 0.05) { // 5% chance per second per card to change price slightly
+                        const volatility = 0.95 + (Math.random() * 0.1); // 0.95 to 1.05
+                        card.currentPrice = Math.max(card.baseValue * 0.5, card.currentPrice * volatility);
                     }
-                    state.lastDailySpin = now;
-                    state.crystals += 10;
-                    showToast("DAILY BONUS: +10 CRYSTALS!", "crystal");
-                    SaveSystem.saveGame(true);
-                };
-            }
-        } // End setupNavigation
+                });
 
-        // --- ADDED: STRICT ANTI-INSPECT & DEVTOOLS PREVENTION ---
-        
-        // 1. Block right-click context menu (prevents inspect element)
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        
-        // 2. Block Keyboard shortcuts for DevTools
-        document.addEventListener('keydown', event => {
-            if (
-                event.key === 'F12' || 
-                (event.ctrlKey && event.shiftKey && ['I', 'J', 'C'].includes(event.key.toUpperCase())) ||
-                (event.ctrlKey && event.key.toUpperCase() === 'U')
-            ) {
-                event.preventDefault();
-                AntiHack.logConsole("[SENTINEL] Developer Tools shortcut blocked.", "text-accentRed");
-                AntiHack.triggerBreach("Attempted to use Developer console shortcut.");
-            }
-        });
+                // Anti-Hack Integrity Check every few seconds
+                if (Math.random() < 0.2) {
+                    AntiHack.validateStateIntegrity();
+                }
 
-        // 3. Debugger Trap (Pauses if they open DevTools via browser menu, which catches them)
-        setInterval(() => {
-            const start = performance.now();
-            debugger; 
-            const end = performance.now();
-            if (end - start > 100) {
-                AntiHack.triggerBreach("Memory Code Inspector / Debugger execution detected.");
-                AntiHack.sanitizeValues(rawState); 
-            }
-        }, 2000);
+                if (document.getElementById('screen-market').classList.contains('hidden') === false) {
+                    renderMarket();
+                }
+                
+                if (document.getElementById('screen-leaderboard').classList.contains('hidden') === false) {
+                    renderLeaderboard();
+                }
 
-        // --- GAME LOOP & CONTINUOUS INTEGRITY CHECK ---
-        
-        setInterval(() => {
-            // Passive Income Calculation
-            const income = calculateTotalIncome();
-            if (income > 0) {
-                state.balance += income;
-                updateUI();
-            }
+            }, 1000);
             
-            // Continuous Background Value Fixing & Validation
-            AntiHack.sanitizeValues(rawState);
-            if (!AntiHack.validateStateIntegrity()) {
-                updateUI(); // Force refresh UI if values had to be clamped
-            }
-        }, 1000);
+            // Auto Save Loop
+            setInterval(() => {
+                SaveSystem.saveGame(true);
+            }, 30000); // 30 sec auto save
+        }
 
-        // Auto Save Loop
-        setInterval(() => {
-            SaveSystem.saveGame(true);
-        }, 30000);
+        // --- STREAMING_CHUNK:Initializing Application and Event Listeners... ---
+        function initApp() {
+            // Build Filter Dropdowns
+            const rFilter = document.getElementById('market-filter-rarity');
+            const cFilter = document.getElementById('collection-filter-rarity');
+            Object.values(RARITIES).forEach(r => {
+                const opt = new Option(r.name, r.name.toLowerCase());
+                const opt2 = new Option(r.name, r.name.toLowerCase());
+                if(r.name !== "VOID TIER") { // keep value matching ID pattern
+                   opt.value = Object.keys(RARITIES).find(k=>RARITIES[k].name === r.name);
+                   opt2.value = opt.value;
+                } else {
+                   opt.value = "voidTier";
+                   opt2.value = "voidTier";
+                }
+                rFilter.add(opt);
+                cFilter.add(opt2);
+            });
 
-        // System Boot
-        window.onload = () => {
+            const cats = [...new Set(RAW_CARD_DATABASE.map(c => c.category))];
+            const mCatFilter = document.getElementById('market-filter-category');
+            const colCatFilter = document.getElementById('collection-filter-category');
+            cats.forEach(cat => {
+                mCatFilter.add(new Option(cat, cat));
+                colCatFilter.add(new Option(cat, cat));
+            });
+
+            // Nav Setup
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    document.querySelectorAll('.screen-content').forEach(s => s.classList.add('hidden'));
+                    const targetId = btn.getAttribute('data-target');
+                    document.getElementById(targetId).classList.remove('hidden');
+
+                    if (targetId === 'screen-market') renderMarket();
+                    if (targetId === 'screen-collection') renderCollection();
+                    if (targetId === 'screen-forge') renderForge();
+                    if (targetId === 'screen-arena') renderArena();
+                    if (targetId === 'screen-leaderboard') renderLeaderboard();
+                });
+            });
+
+            // Modals Close
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btn.closest('.fixed').classList.add('hidden');
+                });
+            });
+
+            // Search & Filters
+            document.getElementById('global-search-input').addEventListener('input', () => {
+                if(!document.getElementById('screen-market').classList.contains('hidden')) renderMarket();
+            });
+            document.getElementById('market-filter-rarity').addEventListener('change', renderMarket);
+            document.getElementById('market-filter-category').addEventListener('change', renderMarket);
+            
+            document.getElementById('collection-filter-rarity').addEventListener('change', renderCollection);
+            document.getElementById('collection-filter-category').addEventListener('change', renderCollection);
+            document.getElementById('collection-sort').addEventListener('change', renderCollection);
+
+            // Daily Spin
+            document.getElementById('btn-daily-bonus').addEventListener('click', () => {
+                const now = Date.now();
+                if (now - state.lastDailySpin < 86400000) {
+                    const hoursLeft = Math.ceil((86400000 - (now - state.lastDailySpin)) / 3600000);
+                    showToast(`Next spin available in ${hoursLeft} hours.`, "error");
+                    return;
+                }
+                
+                const icon = document.getElementById('spin-icon');
+                icon.classList.add('spin-anim');
+                
+                setTimeout(() => {
+                    icon.classList.remove('spin-anim');
+                    const reward = Math.floor(Math.random() * 5000) + 1000;
+                    state.balance += reward;
+                    state.lastDailySpin = now;
+                    showToast(`SPUN THE WHEEL! WON $${reward.toLocaleString()}!`, "success");
+                    SaveSystem.saveGame(true);
+                }, 1000);
+            });
+
+            document.getElementById('btn-claim-vault').addEventListener('click', () => {
+                 showToast("Vault is currently locked. Requires Level 10.", "error");
+            });
+
+            // Setup Username Modal
+            setupUsernameModal();
+
+            // SAVE I/O Listeners
+            const ioModal = document.getElementById('modal-save-io');
+            const ioTextarea = document.getElementById('save-io-textarea');
+            let isExportMode = true;
+
+            document.getElementById('btn-sec-export').addEventListener('click', () => {
+                isExportMode = true;
+                ioModal.classList.remove('hidden');
+                document.getElementById('save-io-title').innerHTML = `<i class="ph ph-export text-accentCyan"></i> EXPORT SAVE DATA`;
+                document.getElementById('save-io-desc').innerText = "Copy this encrypted string to back up your progress.";
+                ioTextarea.value = SaveSystem.exportSaveString();
+                ioTextarea.readOnly = true;
+                const actionBtn = document.getElementById('btn-save-io-action');
+                actionBtn.innerText = "COPY TO CLIPBOARD";
+                actionBtn.className = "brutal-btn flex-1 py-3 bg-accentCyan text-black font-black-custom";
+            });
+
+            document.getElementById('btn-sec-import').addEventListener('click', () => {
+                isExportMode = false;
+                ioModal.classList.remove('hidden');
+                document.getElementById('save-io-title').innerHTML = `<i class="ph ph-import text-accent"></i> IMPORT SAVE DATA`;
+                document.getElementById('save-io-desc').innerText = "Paste your previously exported save string below. THIS WILL OVERWRITE CURRENT DATA.";
+                ioTextarea.value = "";
+                ioTextarea.readOnly = false;
+                const actionBtn = document.getElementById('btn-save-io-action');
+                actionBtn.innerText = "IMPORT & OVERWRITE";
+                actionBtn.className = "brutal-btn flex-1 py-3 bg-accentRed text-white font-black-custom";
+            });
+
+            document.querySelectorAll('.close-save-modal').forEach(b => b.addEventListener('click', () => ioModal.classList.add('hidden')));
+
+            document.getElementById('btn-save-io-action').addEventListener('click', () => {
+                if (isExportMode) {
+                    ioTextarea.select();
+                    document.execCommand('copy');
+                    showToast("Save string copied to clipboard!", "success");
+                } else {
+                    const code = ioTextarea.value;
+                    if (!code) { showToast("Please paste a save code first.", "error"); return; }
+                    if (SaveSystem.importSaveString(code)) {
+                        ioModal.classList.add('hidden');
+                    }
+                }
+            });
+
+            document.getElementById('btn-sec-save-now').addEventListener('click', () => SaveSystem.saveGame(false));
+            document.getElementById('btn-quick-save').addEventListener('click', () => SaveSystem.saveGame(false));
+            document.getElementById('save-status-badge').addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                document.querySelector('[data-target="screen-security"]').classList.add('active');
+                document.querySelectorAll('.screen-content').forEach(s => s.classList.add('hidden'));
+                document.getElementById('screen-security').classList.remove('hidden');
+            });
+
+            document.getElementById('btn-sec-reset').addEventListener('click', () => {
+                if(confirm("CRITICAL WARNING: This will permanently wipe all cards, balance, and progress. Are you absolutely sure?")) {
+                    SaveSystem.resetGame();
+                }
+            });
+
+            // Anti-Hack Action Handlers
+            document.getElementById('btn-anti-hack-revert').addEventListener('click', () => {
+                document.getElementById('modal-anti-hack-alert').classList.add('hidden');
+                if(!SaveSystem.loadGame()) {
+                    SaveSystem.resetGame();
+                }
+                showToast("State restored from secure save.", "info");
+                document.getElementById('anti-hack-badge').className = "bg-accentGreen text-black px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom text-[10px] flex items-center gap-1 cursor-pointer";
+                document.getElementById('anti-hack-status-text').innerText = "SHIELD ACTIVE";
+            });
+
+            document.getElementById('btn-anti-hack-purge').addEventListener('click', () => {
+                document.getElementById('modal-anti-hack-alert').classList.add('hidden');
+                // Force sync variables to baseline
+                state.balance = AntiHack.lastVerifiedBalance;
+                state.crystals = AntiHack.lastVerifiedCrystals;
+                SaveSystem.saveGame(false);
+                showToast("Anomalies purged. Continuing securely.", "success");
+                document.getElementById('anti-hack-badge').className = "bg-accentGreen text-black px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom text-[10px] flex items-center gap-1 cursor-pointer";
+                document.getElementById('anti-hack-status-text').innerText = "SHIELD ACTIVE";
+            });
+
+
+            // Boot Sequence
             SaveSystem.loadGame();
-            setupNavigation();
+            renderCrates();
             renderMarket();
             renderCollection();
-            renderCrates();
-            renderLeaderboard();
             updateUI();
-            
-            // Force initial value sanitization on boot in case of corrupted old saves
-            AntiHack.sanitizeValues(rawState);
-            AntiHack.validateStateIntegrity();
-        };
+            gameLoop();
+            startAuctionLoop();
+        }
+
+        window.onload = initApp;
 
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CARD//MARKET: MASSIVE EXPANSION v2.2 - ANTI-HACK & SAVE DATA UPDATE</title>
+    <title>CARD//MARKET: MASSIVE EXPANSION v2.2 - ANTI-HACK & ONLINE LEADERBOARD UPDATE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -88,11 +88,16 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.03); opacity: 0.9; }
+        }
 
         .animate-marquee { animation: marquee 35s linear infinite; }
         .price-up { animation: flash-green 0.8s ease; }
         .price-down { animation: flash-red 0.8s ease; }
         .spin-anim { animation: spin 2s linear infinite; }
+        .pulse-glow { animation: pulse-glow 1.5s infinite ease-in-out; }
 
         .brutal-border { border: 3px solid #000; }
         
@@ -242,22 +247,20 @@
         <span class="bg-accentRed text-white px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom animate-pulse">EXPANSION v2.2 LIVE</span>
         <div class="overflow-hidden w-full relative">
             <div id="ticker-marquee" class="animate-marquee whitespace-nowrap inline-block">
-                <span>OVER 60+ UNIQUE CARDS ADDED TO THE MARKETPLACE... DISCOVER NEW CYBERPUNK, VOID HORROR & MECHA SETS NOW! ANTI-HACK SYSTEM ENGAGED & AUTO-SAVE ENCRYPTED.</span>
+                <span>OVER 60+ UNIQUE CARDS ADDED TO THE MARKETPLACE... FORGE CRAFTING COOLDOWNS ACTIVE... LIVE ONLINE LEADERBOARDS CONNECTED! ANTI-HACK SYSTEM ENGAGED & AUTO-SAVE ENCRYPTED.</span>
             </div>
         </div>
         
-        <!-- SAVE STATUS BADGE -->
         <div id="save-status-badge" class="bg-accent text-black px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom text-[10px] flex items-center gap-1 cursor-pointer" title="Click to open Save Manager">
             <i class="ph ph-floppy-disk text-sm"></i> <span id="save-status-text">AUTO-SAVED</span>
         </div>
 
-        <!-- ANTI-HACK SHIELD BADGE -->
         <div id="anti-hack-badge" class="bg-accentGreen text-black px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom text-[10px] flex items-center gap-1 cursor-pointer" title="Anti-Hack Sentinel Active">
             <i class="ph ph-shield-check text-sm"></i> <span id="anti-hack-status-text">SHIELD ACTIVE</span>
         </div>
 
         <div id="connection-status-badge" class="bg-accentCyan text-black px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom text-[10px]">
-            ONLINE
+            ONLINE NETWORK
         </div>
     </div>
 
@@ -293,7 +296,6 @@
                 <div class="font-black-custom text-sm text-white bg-accentPurple px-2 py-0.5 border border-black shadow-brutal-sm" id="ui-crystals">0 💎</div>
             </div>
 
-            <!-- HEADER QUICK SAVE BUTTON -->
             <button id="btn-quick-save" class="brutal-btn p-2 text-xs bg-accent flex items-center justify-center" title="Save Game Data">
                 <i class="ph ph-floppy-disk text-xl"></i>
             </button>
@@ -301,14 +303,13 @@
     </header>
 
     <div class="flex flex-1 overflow-hidden relative">
-
         <aside class="w-64 bg-white brutal-border border-t-0 border-l-0 flex flex-col z-20 h-full shrink-0 shadow-[4px_0_0_rgba(0,0,0,1)] relative">
             <div class="p-3 brutal-border border-l-0 border-r-0 border-t-0 bg-gray-100 flex items-center gap-3">
-                <div class="w-10 h-10 bg-accent brutal-border shadow-brutal-sm flex items-center justify-center text-xl font-bold cursor-pointer" id="ui-avatar-container" title="Click to change username">
+                <div class="w-10 h-10 bg-accent brutal-border shadow-brutal-sm flex items-center justify-center text-xl font-bold cursor-pointer hover:bg-accentGreen transition-colors" id="ui-avatar-container" title="Click to change username">
                     <i class="ph ph-user-gear"></i>
                 </div>
-                <div class="overflow-hidden">
-                    <div class="font-black-custom text-sm uppercase tracking-tighter truncate cursor-pointer" id="ui-player-name" title="Click to change username">TRADER_01</div>
+                <div class="overflow-hidden flex-1">
+                    <div class="font-black-custom text-sm uppercase tracking-tighter truncate cursor-pointer hover:underline" id="ui-player-name" title="Click to change username">TRADER_01</div>
                     <div class="text-[9px] font-bold bg-black text-white px-2 py-0.5 inline-block">LVL <span id="ui-player-level">1</span> MOGUL</div>
                 </div>
             </div>
@@ -327,8 +328,9 @@
                 <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left" data-target="screen-collection">
                     <i class="ph ph-cards text-lg"></i> <span>CARDDEX Database</span>
                 </button>
-                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left bg-accentCyan/30" data-target="screen-forge">
+                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left bg-accentCyan/30 relative" data-target="screen-forge">
                     <i class="ph ph-fire text-lg text-accentRed"></i> <span>THE FORGE</span>
+                    <span id="forge-nav-timer" class="ml-auto bg-accentRed text-white text-[9px] font-black-custom px-1 border border-black hidden animate-pulse">00:30</span>
                 </button>
                 <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left bg-accentRed/20" data-target="screen-arena">
                     <i class="ph ph-sword text-lg text-accentRed"></i> <span>BATTLE ARENA</span>
@@ -337,11 +339,11 @@
                     <i class="ph ph-gavel text-lg text-accentPurple"></i> <span>LIVE AUCTION</span>
                     <span class="absolute -top-1.5 -right-1.5 bg-accentPurple text-white border-2 border-black font-black-custom px-1.5 shadow-brutal-sm text-[10px]">LIVE</span>
                 </button>
-                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left" data-target="screen-leaderboard">
-                    <i class="ph ph-trophy text-lg"></i> <span>GLOBAL RANKINGS</span>
+                <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left bg-accent/30" data-target="screen-leaderboard">
+                    <i class="ph ph-trophy text-lg text-yellow-600"></i> <span>GLOBAL RANKINGS</span>
+                    <span class="ml-auto bg-black text-white text-[9px] font-black-custom px-1">ONLINE</span>
                 </button>
                 
-                <!-- NEW SECURITY & SAVES NAVIGATION MENU ITEM -->
                 <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left bg-accent/40 mt-auto" data-target="screen-security">
                     <i class="ph ph-shield-checkered text-lg text-black"></i> <span>SECURITY & SAVES</span>
                     <span class="ml-auto bg-black text-white text-[9px] font-black-custom px-1">SAFE</span>
@@ -397,15 +399,15 @@
                     </div>
                     <div class="brutal-box p-4 flex flex-col gap-1 bg-white">
                         <div class="font-bold border-b-3 border-black pb-1 text-[10px] sm:text-sm flex justify-between">
-                            <span>NETWORK TRADERS</span>
-                            <i class="ph ph-users text-lg hidden sm:block"></i>
+                            <span>GLOBAL RANK</span>
+                            <i class="ph ph-trophy text-lg text-yellow-600 hidden sm:block"></i>
                         </div>
-                        <div class="font-black-custom text-xl sm:text-3xl mt-1" id="dash-bots-count">0</div>
+                        <div class="font-black-custom text-xl sm:text-3xl mt-1" id="dash-player-rank">#--</div>
                     </div>
                     <div class="brutal-box p-4 flex flex-col gap-1 bg-accentCyan">
                         <div class="font-bold border-b-3 border-black pb-1 text-[10px] sm:text-sm flex justify-between">
                             <span>ARENA WINS</span>
-                            <i class="ph ph-trophy text-lg hidden sm:block"></i>
+                            <i class="ph ph-sword text-lg hidden sm:block"></i>
                         </div>
                         <div class="font-black-custom text-xl sm:text-3xl mt-1" id="dash-arena-wins">0</div>
                     </div>
@@ -424,10 +426,10 @@
                     <div class="col-span-1 lg:col-span-2 brutal-box p-0 flex flex-col bg-white">
                         <h3 class="font-black-custom text-sm sm:text-lg p-3 border-b-4 border-black bg-accent text-black uppercase flex items-center justify-between">
                             <span class="flex items-center gap-2"><i class="ph ph-broadcast"></i> LIVE MARKET ACTIVITY</span>
-                            <span class="text-[9px] font-bold bg-black text-white px-2 py-0.5" id="multiplayer-count-badge">LIVE NETWORK</span>
+                            <span class="text-[9px] font-bold bg-black text-white px-2 py-0.5" id="multiplayer-count-badge">ONLINE NETWORK</span>
                         </h3>
                         <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 font-bold text-xs bg-gray-100" id="global-chat">
-                            <div class="text-gray-500 italic p-1 text-center bg-white brutal-border mb-2">Connecting to multiplayer server...</div>
+                            <div class="text-gray-500 italic p-1 text-center bg-white brutal-border mb-2">Connecting to live network server...</div>
                         </div>
                     </div>
                 </div>
@@ -510,12 +512,15 @@
             </div>
 
             <div id="screen-forge" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-6">
-                <div class="flex justify-between items-center border-b-4 border-black pb-4 mb-4 shrink-0">
+                <div class="flex justify-between items-center border-b-4 border-black pb-4 mb-4 shrink-0 flex-wrap gap-2">
                     <div>
                         <h2 class="font-black-custom text-2xl sm:text-3xl uppercase flex items-center gap-2">
                             <i class="ph ph-fire text-accentRed"></i> THE FORGE / FUSION LAB
                         </h2>
-                        <p class="font-bold text-xs text-gray-600 mt-0.5">Burn 3 duplicate cards to craft a random item from the NEXT rarity tier!</p>
+                        <p class="font-bold text-xs text-gray-600 mt-0.5">Burn 3 duplicate cards to craft a higher tier card! (1 Hour Forge Timer)</p>
+                    </div>
+                    <div id="forge-status-badge" class="bg-black text-white text-xs font-black-custom px-3 py-1.5 brutal-border border-accent flex items-center gap-2">
+                        <i class="ph ph-timer text-accent font-bold"></i> <span id="forge-status-text">FORGE READY</span>
                     </div>
                 </div>
 
@@ -528,6 +533,7 @@
                     </div>
                     <div class="w-full lg:w-1/2 flex flex-col items-center justify-center brutal-border bg-white p-6 relative overflow-hidden flex-1" id="forge-action-area">
                         <div class="text-center text-gray-400 font-black-custom text-xl" id="forge-empty-state">SELECT A CARD WITH 3+ COPIES TO FORGE</div>
+                        <!-- Forge action content dynamically injected here -->
                     </div>
                 </div>
             </div>
@@ -612,21 +618,26 @@
             </div>
 
             <div id="screen-leaderboard" class="screen-content hidden h-full flex flex-col relative z-10 bg-white brutal-box p-0">
-                <div class="p-4 bg-black text-white border-b-4 border-black flex justify-between items-center shrink-0">
+                <div class="p-4 bg-black text-white border-b-4 border-black flex justify-between items-center shrink-0 flex-wrap gap-2">
                     <div>
-                        <h2 class="font-black-custom text-2xl uppercase">GLOBAL MARKET MOGULS</h2>
-                        <div class="text-xs text-gray-300 font-bold" id="leaderboard-subhead">LIVE NETWORK TRADERS</div>
+                        <h2 class="font-black-custom text-2xl uppercase flex items-center gap-2">
+                            <i class="ph ph-trophy text-accent"></i> GLOBAL ONLINE MARKET RANKINGS
+                        </h2>
+                        <div class="text-xs text-gray-300 font-bold" id="leaderboard-subhead">LIVE NETWORK TRADERS • REAL-TIME RANKING</div>
                     </div>
+                    <button id="btn-change-leaderboard-name" class="brutal-btn bg-accent text-black px-3 py-1.5 text-xs font-black-custom flex items-center gap-1">
+                        <i class="ph ph-pencil-simple text-sm"></i> CHANGE YOUR NAME
+                    </button>
                 </div>
                 <div class="flex flex-col overflow-hidden h-full">
-                    <div class="flex bg-gray-200 p-3 border-b-4 border-black font-black-custom uppercase text-xs sticky top-0 z-10">
+                    <div class="flex bg-gray-200 p-3 border-b-4 border-black font-black-custom uppercase text-xs sticky top-0 z-10 items-center">
                         <div class="w-16 text-center">RANK</div>
-                        <div class="flex-1">TRADER</div>
+                        <div class="flex-1">TRADER ACCOUNT</div>
                         <div class="w-20 text-center hidden sm:block">LVL</div>
-                        <div class="w-32 text-right">NET WORTH</div>
+                        <div class="w-36 text-right">NET WORTH</div>
                     </div>
-                    <div class="flex-1 overflow-y-auto" id="leaderboard-list">
-                        <!-- Populated by JS -->
+                    <div class="flex-1 overflow-y-auto divide-y-2 divide-black" id="leaderboard-list">
+                        <!-- Populated dynamically with Player + Network Traders -->
                     </div>
                 </div>
             </div>
@@ -645,7 +656,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- SAVE MANAGEMENT PANEL -->
                     <div class="brutal-box p-5 bg-gray-50 flex flex-col gap-4">
                         <h3 class="font-black-custom text-xl uppercase border-b-3 border-black pb-2 flex items-center gap-2">
                             <i class="ph ph-floppy-disk text-accentPurple"></i> SAVE DATA CONTROLS
@@ -682,7 +692,6 @@
                         </div>
                     </div>
 
-                    <!-- ANTI-HACK STATUS PANEL -->
                     <div class="brutal-box p-5 bg-gray-50 flex flex-col gap-4">
                         <h3 class="font-black-custom text-xl uppercase border-b-3 border-black pb-2 flex items-center gap-2">
                             <i class="ph ph-shield-warning text-accentRed"></i> ANTI-HACK INTEGRITY SENTINEL
@@ -715,8 +724,6 @@
         </main>
     </div>
 
-
-    <!-- Crate Modal -->
     <div id="modal-crate-open" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[100] hidden flex flex-col items-center justify-center p-6">
         <div class="brutal-box p-6 bg-white relative z-10 flex flex-col items-center w-full max-w-5xl overflow-hidden shadow-[10px_10px_0_#ffcc00]">
             <h2 class="font-black-custom text-2xl sm:text-3xl uppercase mb-4 border-b-4 border-black pb-2 w-full text-center" id="crate-title">DECRYPTING SUPPLY...</h2>
@@ -743,6 +750,7 @@
                 </div>
             </div>
 
+            <!-- This div is completely hidden during spinner to prevent scamming/annoyance -->
             <div id="reveal-info" class="hidden flex-col items-center w-full mt-4 sm:mt-8 z-20">
                 <div class="font-black-custom text-xl sm:text-3xl text-center mb-3 px-6 py-2 brutal-border w-full max-w-md bg-black text-white shadow-brutal" id="reveal-name">CARD NAME</div>
                 <div class="flex flex-wrap gap-2 sm:gap-4 mb-4 w-full justify-center text-xs sm:text-sm">
@@ -755,7 +763,6 @@
         </div>
     </div>
 
-    <!-- Trade Modal -->
     <div id="modal-trade" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-4">
         <div class="brutal-box p-6 bg-white max-w-md w-full relative">
             <button class="absolute top-2 right-2 text-xl font-black hover:text-accentRed close-modal">X</button>
@@ -768,1302 +775,669 @@
                 <button id="btn-modal-buy" class="brutal-btn flex-1 py-3 bg-accentGreen text-black font-black-custom hidden">BUY COPY</button>
                 <button id="btn-modal-sell" class="brutal-btn flex-1 py-3 bg-accentRed text-white font-black-custom hidden">SELL COPY</button>
             </div>
-            <div class="text-center mt-2 text-xs font-bold text-gray-500">You own: <span id="trade-modal-owned">0</span> copies</div>
         </div>
     </div>
 
-    <!-- EXPORT/IMPORT MODAL -->
-    <div id="modal-save-io" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[120] hidden flex items-center justify-center p-4">
-        <div class="brutal-box p-6 bg-white max-w-lg w-full relative">
-            <button class="absolute top-2 right-2 text-xl font-black hover:text-accentRed close-save-modal">X</button>
-            <h2 class="font-black-custom text-2xl uppercase mb-4 border-b-4 border-black pb-2 flex items-center gap-2" id="save-io-title">SAVE DATA EXPORT/IMPORT</h2>
-            
-            <p class="text-xs font-bold text-gray-600 mb-3" id="save-io-desc">Copy your encrypted save code or paste code below to import.</p>
+    <div id="notification-container" class="fixed bottom-4 right-4 flex flex-col gap-2 pointer-events-none"></div>
 
-            <textarea id="save-io-textarea" class="w-full h-32 brutal-border p-3 font-mono text-xs focus:outline-none bg-gray-50 resize-none font-bold" placeholder="Paste Base64 Save String Here..."></textarea>
-
-            <div class="flex gap-3 mt-4">
-                <button id="btn-save-io-action" class="brutal-btn flex-1 py-3 bg-accentGreen text-black font-black-custom">COPY SAVE CODE</button>
-                <button class="brutal-btn py-3 px-5 bg-gray-200 text-black font-black-custom close-save-modal">CANCEL</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ANTI-HACK VIOLATION QUARANTINE MODAL -->
-    <div id="modal-anti-hack-alert" class="fixed inset-0 bg-black/95 backdrop-blur-md z-[150] hidden flex items-center justify-center p-4">
-        <div class="brutal-box p-6 bg-accentRed text-white max-w-lg w-full relative brutal-border border-white shadow-[10px_10px_0_#fff]">
-            <h2 class="font-black-custom text-3xl uppercase mb-2 flex items-center gap-2">
-                <i class="ph ph-shield-warning text-4xl"></i> INTEGRITY BREACH DETECTED
-            </h2>
-            <div class="bg-black text-white p-4 brutal-border border-white text-xs font-mono mb-4 flex flex-col gap-2">
-                <div class="text-accentRed font-bold">[ANTI-HACK SENTINEL ALERT]</div>
-                <div id="anti-hack-breach-reason">Unauthorized memory modification or balance injection detected.</div>
-                <div class="text-gray-400">Values have been quarantined to maintain market stability and ranking validity.</div>
-            </div>
-
-            <p class="text-xs font-bold uppercase mb-4">Select recovery action to restore anti-cheat compliance:</p>
-
-            <div class="flex flex-col gap-3">
-                <button id="btn-anti-hack-revert" class="brutal-btn py-3 bg-white text-black font-black-custom hover:bg-accent">
-                    ROLLBACK TO LAST SECURE SAVE STATE
-                </button>
-                <button id="btn-anti-hack-purge" class="brutal-btn py-3 bg-accent text-black font-black-custom">
-                    PURGE TAMPERED VALUES & CONTINUE
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- USERNAME MODAL -->
-    <div id="modal-username" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[130] hidden flex items-center justify-center p-4">
-        <div class="brutal-box p-6 bg-white max-w-md w-full relative">
-            <button class="absolute top-2 right-2 text-xl font-black hover:text-accentRed close-username-modal">X</button>
-            <h2 class="font-black-custom text-2xl uppercase mb-4 border-b-4 border-black pb-2 flex items-center gap-2">
-                <i class="ph ph-user-gear text-accent"></i> SET UNIQUE TRADER ID
-            </h2>
-            <p class="text-xs font-bold text-gray-600 mb-3">Establish your identity on the global market leaderboard.</p>
-            <input type="text" id="username-input" class="brutal-input w-full mb-4 text-center font-black-custom text-xl uppercase" placeholder="ENTER TRADER ID" maxlength="15">
-            <button id="btn-save-username" class="brutal-btn w-full py-3 bg-accent text-black font-black-custom">CONFIRM ID</button>
-        </div>
-    </div>
-
-    <div id="notification-container" class="fixed bottom-4 right-4 flex flex-col gap-2 z-[9999]"></div>
-
-    <script type="module">
-        // --- 1. RARITY SETTINGS ---
+    <script>
+        // CONFIG & STATE
         const RARITIES = {
-            common: { color: 'bg-gray-400', hex: '#a0a0a0', weight: 60, name: 'COMMON', rank: 1, baseValue: 50, baseIncome: 1 },
-            uncommon: { color: 'bg-green-400', hex: '#00cc66', weight: 25, name: 'UNCOMMON', rank: 2, baseValue: 250, baseIncome: 6 },
-            rare: { color: 'bg-blue-500', hex: '#3366ff', weight: 10, name: 'RARE', rank: 3, baseValue: 1200, baseIncome: 30 },
-            epic: { color: 'bg-purple-500', hex: '#cc33ff', weight: 4, name: 'EPIC', rank: 4, baseValue: 6000, baseIncome: 180 },
-            legendary: { color: 'bg-orange-500', hex: '#ff9900', weight: 0.9, name: 'LEGENDARY', rank: 5, baseValue: 30000, baseIncome: 1200 },
-            mythic: { color: 'bg-red-600', hex: '#ff0000', weight: 0.09, name: 'MYTHIC', rank: 6, baseValue: 180000, baseIncome: 6500 },
-            voidTier: { color: 'bg-cyan-400', hex: '#00f0ff', weight: 0.01, name: 'VOID TIER', rank: 7, baseValue: 1250000, baseIncome: 32000 }
+            common: { color: 'bg-common', name: 'COMMON', multiplier: 1, textClass: 'text-gray-500' },
+            uncommon: { color: 'bg-uncommon', name: 'UNCOMMON', multiplier: 2.5, textClass: 'text-green-600' },
+            rare: { color: 'bg-rare', name: 'RARE', multiplier: 8, textClass: 'text-blue-600' },
+            epic: { color: 'bg-epic', name: 'EPIC', multiplier: 25, textClass: 'text-purple-600' },
+            legendary: { color: 'bg-legendary', name: 'LEGENDARY', multiplier: 100, textClass: 'text-orange-500' },
+            mythic: { color: 'bg-mythic', name: 'MYTHIC', multiplier: 500, textClass: 'text-red-600' },
+            voidTier: { color: 'bg-voidTier', name: 'VOID TIER', multiplier: 2500, textClass: 'text-cyan-400' }
         };
 
-        // --- 2. MASSIVE HAND-CRAFTED UNIQUE CARDS DATABASE (60+ UNIQUE CARDS) ---
-        const RAW_CARD_DATABASE = [
-            // --- COMMON (12 unique cards) ---
-            { id: "C-01", name: "Rust Scavenger", rarity: "common", category: "Cyberpunk", icon: "ph-wrench", flavor: "Feeds on broken circuits in Lower District 9." },
-            { id: "C-02", name: "Data Leech Bot", rarity: "common", category: "Tech", icon: "ph-bug-beetle", flavor: "Siphons unencrypted megabytes while you sleep." },
-            { id: "C-03", name: "Neon Alley Rover", rarity: "common", category: "Cyberpunk", icon: "ph-moped", flavor: "Delivers illegal firmware patches at top speed." },
-            { id: "C-04", name: "Copper Golem v1", rarity: "common", category: "Mecha", icon: "ph-robot", flavor: "Built from discarded factory press parts." },
-            { id: "C-05", name: "Sewer Parasite", rarity: "common", category: "Monsters", icon: "ph-bug", flavor: "Breathes toxic industrial runoff for energy." },
-            { id: "C-06", name: "Signal Relay Drone", rarity: "common", category: "Space", icon: "ph-broadcast", flavor: "Keeps outer colony comms connected across the belt." },
-            { id: "C-07", name: "Glitch Imp", rarity: "common", category: "Monsters", icon: "ph-ghost", flavor: "Causes minor display errors and phantom notifications." },
-            { id: "C-08", name: "Sub-Orbital Probe", rarity: "common", category: "Space", icon: "ph-radar", flavor: "Captures thermal weather imagery from high orbit." },
-            { id: "C-09", name: "Circuit Beetle", rarity: "common", category: "Tech", icon: "ph-cpu", flavor: "Glares faintly whenever high voltage passes nearby." },
-            { id: "C-10", name: "Street Merc Recruit", rarity: "common", category: "Cyberpunk", icon: "ph-crosshair", flavor: "Fights for pocket change and cheap synthetic gin." },
-            { id: "C-11", name: "Asteroid Mining Rig", rarity: "common", category: "Space", icon: "ph-hammer", flavor: "Crushes ice boulders into raw hydrogen fuel." },
-            { id: "C-12", name: "Obsidian Shard", rarity: "common", category: "Artifacts", icon: "ph-diamond", flavor: "Vibrates quietly near radioactive power cores." },
+        const CATEGORIES = ['HACKER', 'CYBER', 'MECHA', 'BIO', 'CRYPTO', 'VOID'];
 
-            // --- UNCOMMON (12 unique cards) ---
-            { id: "U-01", name: "Grid Enforcer Unit", rarity: "uncommon", category: "Cyberpunk", icon: "ph-shield-warning", flavor: "Authorized to use non-lethal shock baton protocols." },
-            { id: "U-02", name: "Quantum RAM Module", rarity: "uncommon", category: "Tech", icon: "ph-microchip", flavor: "Processes billions of probabilities in nanoseconds." },
-            { id: "U-03", name: "Vaporwave Synth", rarity: "uncommon", category: "Cyberpunk", icon: "ph-wave-sine", flavor: "Emits sub-bass pulses that calm cybernetic implants." },
-            { id: "U-04", name: "Heavy Trench Mecha", rarity: "uncommon", category: "Mecha", icon: "ph-sword", flavor: "Designed for thick artillery skirmishes on titan moon dust." },
-            { id: "U-05", name: "Giga Stalker", rarity: "uncommon", category: "Monsters", icon: "ph-spider", flavor: "Camouflages against fiber optic cabling trees." },
-            { id: "U-06", name: "Solar Sail Freighter", rarity: "uncommon", category: "Space", icon: "ph-rocket-launch", flavor: "Rides solar photons between Venusian trade docks." },
-            { id: "U-07", name: "Biomedical Automaton", rarity: "uncommon", category: "Tech", icon: "ph-first-aid-kit", flavor: "Performs open-heart surgery with micrometer laser scalpels." },
-            { id: "U-08", name: "Plasma Cutter Tank", rarity: "uncommon", category: "Mecha", icon: "ph-armchair", flavor: "Melts through blast doors in less than 3 seconds." },
-            { id: "U-09", name: "Deep Sea Crawler", rarity: "uncommon", category: "Monsters", icon: "ph-fish-simple", flavor: "Endures oceanic pressures at trench depth 11,000m." },
-            { id: "U-10", name: "Holographic Pop Idol", rarity: "uncommon", category: "Cyberpunk", icon: "ph-music-notes", flavor: "Sells out stadiums without ever existing in physical space." },
-            { id: "U-11", name: "Lunar Refinery Core", rarity: "uncommon", category: "Space", icon: "ph-factory", flavor: "Extracts Helium-3 for inter-planetary warp reactors." },
-            { id: "U-12", name: "Rune-Inscribed Codex", rarity: "uncommon", category: "Artifacts", icon: "ph-book-bookmark", flavor: "Pages rewrite themselves based on lunar cycles." },
-
-            // --- RARE (10 unique cards) ---
-            { id: "R-01", name: "Cyber Samurai Ronin", rarity: "rare", category: "Cyberpunk", icon: "ph-lightning", flavor: "Master of blade-nanite deflection technomancy." },
-            { id: "R-02", name: "Orbital Ion Cannon", rarity: "rare", category: "Space", icon: "ph-atom", flavor: "Precision orbital kinetic strike hardware." },
-            { id: "R-03", name: "Neural Override Host", rarity: "rare", category: "Tech", icon: "ph-terminal-window", flavor: "Hijacks rival corporate networks without leaving logs." },
-            { id: "R-04", name: "Aegis Siege Dreadnought", rarity: "rare", category: "Mecha", icon: "ph-shield-checkered", flavor: "Has defended Sector 7 from three alien incursions." },
-            { id: "R-05", name: "Void Hive Queen", rarity: "rare", category: "Monsters", icon: "ph-alien", flavor: "Spawns thousands of armored biomech larvae daily." },
-            { id: "R-06", name: "Supercollider Core", rarity: "rare", category: "Tech", icon: "ph-magnet", flavor: "Generates micro black holes for exotic particle research." },
-            { id: "R-07", name: "Nanite Swarm Overlord", rarity: "rare", category: "Tech", icon: "ph-circles-three-plus", flavor: "Consumes enemy vehicles to replicate instantly." },
-            { id: "R-08", name: "Star Cartographer Ship", rarity: "rare", category: "Space", icon: "ph-planet", flavor: "Charts unknown jump gates past the Kuiper Belt." },
-            { id: "R-09", name: "Soul Forge Anvil", rarity: "rare", category: "Artifacts", icon: "ph-fire", flavor: "Binds living plasma into indestructible alloy plating." },
-            { id: "R-10", name: "Infiltration Spectre", rarity: "rare", category: "Cyberpunk", icon: "ph-eye-slash", flavor: "Bends ambient light around its carbon chassis." },
-
-            // --- EPIC (10 unique cards) ---
-            { id: "E-01", name: "Hyperion Titan Mecha", rarity: "epic", category: "Mecha", icon: "ph-skull", flavor: "Stands 80 meters tall. Powered by a compressed star core." },
-            { id: "E-02", name: "Quantum AI Sentinel", rarity: "epic", category: "Tech", icon: "ph-brain", flavor: "Calculates the future 10 minutes before it occurs." },
-            { id: "E-03", name: "Sub-Zero Cryo Dragon", rarity: "epic", category: "Monsters", icon: "ph-snowflake", flavor: "Freezes surrounding thermal energy down to Absolute Zero." },
-            { id: "E-04", name: "Apex Hacker Syndicate", rarity: "epic", category: "Cyberpunk", icon: "ph-fingerprint", flavor: "Controls 40% of all planetary banking credentials." },
-            { id: "E-05", name: "Chronos Time Diode", rarity: "epic", category: "Artifacts", icon: "ph-hourglass", flavor: "Reverses regional entropy by up to thirty seconds." },
-            { id: "E-06", name: "Dreadnought Leviathan", rarity: "epic", category: "Space", icon: "ph-globe-hemisphere-east", flavor: "Warp ship capable of cracking moon crusts." },
-            { id: "E-07", name: "Biohazard Abomination", rarity: "epic", category: "Monsters", icon: "ph-biohazard", flavor: "Mutates rapidly when exposed to radiation fields." },
-            { id: "E-08", name: "Eclipse Orbital Array", rarity: "epic", category: "Space", icon: "ph-sun-dim", flavor: "Blocks entire star systems from receiving solar light." },
-            { id: "E-09", name: "Valhalla Cyber Valkyrie", rarity: "epic", category: "Cyberpunk", icon: "ph-wings", flavor: "Extracts fallen soldier neural consciousness for reboot." },
-            { id: "E-10", name: "Aether Prism Ring", rarity: "epic", category: "Artifacts", icon: "ph-sparkle", flavor: "Focuses cosmic background energy into raw material." },
-
-            // --- LEGENDARY (8 unique cards) ---
-            { id: "L-01", name: "Archangel Prime", rarity: "legendary", category: "Mecha", icon: "ph-crown", flavor: "Divine defense construct built before the Cyber War." },
-            { id: "L-02", name: "Omniscient Matrix Core", rarity: "legendary", category: "Tech", icon: "ph-tree-structure", flavor: "The central nervous system of human interplanetary network." },
-            { id: "L-03", name: "Cosmic World Eater", rarity: "legendary", category: "Monsters", icon: "ph-spiral", flavor: "Rips through planetary rings leaving void cosmic dust." },
-            { id: "L-04", name: "Neo Tokyo Emperor", rarity: "legendary", category: "Cyberpunk", icon: "ph-identification-card", flavor: "Commands the global cyber warfare military defense force." },
-            { id: "L-05", name: "Singularity Engine", rarity: "legendary", category: "Space", icon: "ph-black-hole", flavor: "Bends spacetime folds to collapse distance down to zero." },
-            { id: "L-06", name: "Phoenix Rebirth Flame", rarity: "legendary", category: "Artifacts", icon: "ph-flame", flavor: "Burns out dying galaxies to spark fresh star systems." },
-            { id: "L-07", name: "Colossus Wormhole Gate", rarity: "legendary", category: "Space", icon: "ph-infinity", flavor: "Instantaneous warp portal spanning across two galaxies." },
-            { id: "L-08", name: "Zero-Point Battery", rarity: "legendary", category: "Tech", icon: "ph-battery-charging-vertical", flavor: "Infinite clean electric voltage extracted from quantum vacuum." },
-
-            // --- MYTHIC (6 unique cards) ---
-            { id: "M-01", name: "GOD-ALGORITHM v9", rarity: "mythic", category: "Tech", icon: "ph-eye", flavor: "Sentient digital entity that controls planetary stock markets." },
-            { id: "M-02", name: "Galactic Conqueror Dread", rarity: "mythic", category: "Space", icon: "ph-planet", flavor: "Command ship for armada that conquered Sector 12." },
-            { id: "M-03", name: "Ancient Astral Behemoth", rarity: "mythic", category: "Monsters", icon: "ph-skull", flavor: "Older than the universe itself; slumbers inside dark matter." },
-            { id: "M-04", name: "Excalibur Cyber Blade", rarity: "mythic", category: "Artifacts", icon: "ph-sword", flavor: "Forged in white dwarf stellar core; cuts atomic bonds." },
-            { id: "M-05", name: "Solaris Sun Shatterer", rarity: "mythic", category: "Mecha", icon: "ph-sun", flavor: "Fires localized supernova bursts across galaxy sectors." },
-            { id: "M-06", name: "Cyber Sovereign AI", rarity: "mythic", category: "Cyberpunk", icon: "ph-cpu", flavor: "Rewrites reality codes directly inside local quantum fields." },
-
-            // --- VOID TIER (4 unique cards) ---
-            { id: "V-01", name: "VOID GOD: OMEGA ZERO", rarity: "voidTier", category: "Artifacts", icon: "ph-atom", flavor: "End of all digital data streams. Erases financial reality." },
-            { id: "V-02", name: "VOID GOD: ENTROPY SUPREME", rarity: "voidTier", category: "Monsters", icon: "ph-ghost", flavor: "Consumes light, time and space into perpetual darkness." },
-            { id: "V-03", name: "VOID GOD: INFINITE MECHA", rarity: "voidTier", category: "Mecha", icon: "ph-robot", flavor: "Constructed across eleven dimensional space timelines." },
-            { id: "V-04", name: "VOID GOD: CYBER TRANSCENDENCE", rarity: "voidTier", category: "Cyberpunk", icon: "ph-sparkle", flavor: "Ultimate form of neural digital immortality." }
-        ];
-
-        const CARDS = {};
-        RAW_CARD_DATABASE.forEach(c => {
-            const rarityInfo = RARITIES[c.rarity];
-            CARDS[c.id] = {
-                ...c,
-                baseValue: rarityInfo.baseValue,
-                currentPrice: rarityInfo.baseValue,
-                income: rarityInfo.baseIncome,
-                history: [rarityInfo.baseValue]
-            };
-        });
-
-        // CRATES DEFINITION
+        // Crate configuration - Modified as per user prompt to enforce price/odds gap
         const CRATES = [
-            { id: 'starter', name: 'STARTER BOOSTER', cost: 100, currency: 'cash', icon: 'ph-package', desc: 'Contains Common & Uncommon Cards.', rarities: ['common', 'uncommon'] },
-            { id: 'cyber', name: 'CYBERPUNK CRATE', cost: 1500, currency: 'cash', icon: 'ph-terminal', desc: 'Higher chance for Tech & Cyberpunk Cards.', rarities: ['uncommon', 'rare', 'epic'] },
-            { id: 'titan', name: 'MECHA TITAN BOX', cost: 12000, currency: 'cash', icon: 'ph-robot', desc: 'Guaranteed Rare or higher mecha drops.', rarities: ['rare', 'epic', 'legendary'] },
-            { id: 'void', name: 'VOID REALM CONTAINER', cost: 250, currency: 'crystals', icon: 'ph-black-hole', desc: 'Exotic chance for Legendary, Mythic & Void Tier Cards!', rarities: ['epic', 'legendary', 'mythic', 'voidTier'] }
+            { id: 'c1', name: 'NOVICE CRATE', price: 100, icon: 'ph-package', color: 'bg-common', chances: { common: 80, uncommon: 19, rare: 1, epic: 0, legendary: 0, mythic: 0, voidTier: 0 } },
+            { id: 'c2', name: 'EXPERT BOX', price: 2500, icon: 'ph-briefcase', color: 'bg-rare', chances: { common: 40, uncommon: 40, rare: 15, epic: 5, legendary: 0, mythic: 0, voidTier: 0 } },
+            { id: 'c3', name: 'MOGUL SAFE', price: 15000, icon: 'ph-vault', color: 'bg-epic', chances: { common: 10, uncommon: 30, rare: 40, epic: 15, legendary: 4, mythic: 1, voidTier: 0 } },
+            { id: 'c4', name: 'VOID CUBE', price: 100000, icon: 'ph-cube', color: 'bg-voidTier', chances: { common: 0, uncommon: 0, rare: 20, epic: 40, legendary: 25, mythic: 10, voidTier: 5 } }
         ];
 
-        const DEFAULT_STATE = {
+        let state = {
+            name: "TRADER_01",
             balance: 500,
-            crystals: 50,
-            inventory: { "C-01": 1 }, // Default starter card
+            crystals: 0,
             xp: 0,
             level: 1,
-            arenaWins: 0,
-            lastDailySpin: 0,
-            vaultClaimed: 0,
-            playerName: "TRADER_" + Math.floor(Math.random() * 9999).toString().padStart(4, '0'),
-            createdAt: Date.now()
+            inventory: {},
+            lastSave: Date.now(),
+            arenaWins: 0
         };
 
-        let rawState = { ...DEFAULT_STATE };
-        let shadowHash = ""; // Shadow integrity checksum hash
-
-        // --- STREAMING_CHUNK:Configuring the Anti-Hack Sentinel... ---
-        const AntiHack = {
-            violationsCount: 0,
-            lastVerifiedBalance: 500,
-            lastVerifiedCrystals: 50,
-            lastVerifiedTimestamp: Date.now(),
-
-            // --- ADDED: VALUE FIXING AND SANITIZATION ---
-            sanitizeValues(st) {
-                // Fix generic stats (Balance, Crystals, Level, XP)
-                if (typeof st.balance !== 'number' || isNaN(st.balance) || !isFinite(st.balance) || st.balance < 0) st.balance = 0;
-                if (typeof st.crystals !== 'number' || isNaN(st.crystals) || !isFinite(st.crystals) || st.crystals < 0) st.crystals = 0;
-                if (typeof st.xp !== 'number' || isNaN(st.xp) || !isFinite(st.xp) || st.xp < 0) st.xp = 0;
-                if (typeof st.level !== 'number' || isNaN(st.level) || !isFinite(st.level) || st.level < 1) st.level = 1;
-                
-                // Fix injected inventory counts (stops minus card counts or NaNs)
-                if (st.inventory) {
-                    for (let key in st.inventory) {
-                        if (typeof st.inventory[key] !== 'number' || isNaN(st.inventory[key]) || !isFinite(st.inventory[key]) || st.inventory[key] < 0) {
-                            st.inventory[key] = 0;
-                        }
-                    }
-                }
-            },
-
-            // Compute MD5-like string signature for state integrity
-            computeHash(st) {
-                const keys = `${st.balance}_${st.crystals}_${st.level}_${st.xp}_${st.arenaWins}_${Object.keys(st.inventory || {}).length}`;
-                let hash = 0;
-                for (let i = 0; i < keys.length; i++) {
-                    const char = keys.charCodeAt(i);
-                    hash = ((hash << 5) - hash) + char;
-                    hash |= 0;
-                }
-                return "0x" + Math.abs(hash).toString(16).toUpperCase() + "A9F";
-            },
-
-            // Verify if state balance jump is physically possible based on yield & game mechanics
-            validateStateIntegrity() {
-                this.sanitizeValues(rawState); // ADDED: Always clean values before checking
-
-                const now = Date.now();
-                const deltaSec = Math.max(0.1, (now - this.lastVerifiedTimestamp) / 1000);
-                const maxPossibleYield = (calculateTotalIncome() * deltaSec * 2.5) + 500000; // Genous headroom for legitimate market sales/crate pulls
-
-                // Check 1: Balance overflow jump check
-                if (state.balance - this.lastVerifiedBalance > maxPossibleYield && state.balance > 100000) {
-                    this.triggerBreach("Unusual balance spike detected ($" + Math.floor(state.balance - this.lastVerifiedBalance).toLocaleString() + ")");
-                    return false;
-                }
-
-                // Check 2: State vs Hash comparison
-                const currentHash = this.computeHash(state);
-                if (shadowHash && currentHash !== shadowHash && Math.abs(state.balance - this.lastVerifiedBalance) > 10000000) {
-                    this.triggerBreach("Memory tamper or direct DevTools variable injection detected.");
-                    return false;
-                }
-
-                // Update verified baseline
-                this.lastVerifiedBalance = state.balance;
-                this.lastVerifiedCrystals = state.crystals;
-                this.lastVerifiedTimestamp = now;
-                shadowHash = currentHash;
-
-                document.getElementById('sec-checksum-sig').innerText = shadowHash;
-                return true;
-            },
-
-            triggerBreach(reason) {
-                this.violationsCount++;
-                document.getElementById('anti-hack-breach-reason').innerText = reason;
-                document.getElementById('modal-anti-hack-alert').classList.remove('hidden');
-                document.getElementById('anti-hack-status-text').innerText = "BREACH ALERT";
-                document.getElementById('anti-hack-badge').className = "bg-accentRed text-white px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom text-[10px] flex items-center gap-1 cursor-pointer animate-bounce";
-                
-                this.logConsole(`[SECURITY BREACH #${this.violationsCount}]: ${reason}`, "text-accentRed");
-                document.getElementById('sec-mem-status').innerText = `TAMPERED (${this.violationsCount} DETECTED)`;
-                document.getElementById('sec-mem-status').className = "text-accentRed font-black-custom";
-            },
-
-            logConsole(msg, colorClass = "text-white") {
-                const consoleEl = document.getElementById('sec-security-console-log');
-                if (!consoleEl) return;
-                const div = document.createElement('div');
-                div.className = colorClass;
-                div.innerText = `[${new Date().toLocaleTimeString()}]: ${msg}`;
-                consoleEl.appendChild(div);
-                consoleEl.scrollTop = consoleEl.scrollHeight;
-            }
-        };
-
-        // STATE PROXY WITH CHEAT-DETECTION TRAPS
-        const state = new Proxy(rawState, {
-            set(target, property, value) {
-                // Intercept currency updates for anti-hack validation
-                if (property === 'balance' && typeof value === 'number') {
-                    if (isNaN(value) || value < 0) value = 0;
-                }
-                if (property === 'crystals' && typeof value === 'number') {
-                    if (isNaN(value) || value < 0) value = 0;
-                }
-                
-                target[property] = value;
-                
-                // Keep UI updated on change
-                if (property === 'balance' || property === 'crystals' || property === 'xp' || property === 'playerName') {
-                    updateUI();
-                }
-                return true;
-            }
-        });
-
-        // --- STREAMING_CHUNK:Implementing the Save System... ---
-        const SaveSystem = {
-            STORAGE_KEY: "CARD_MARKET_SAVE_v2_2",
-
-            saveGame(isAuto = false) {
-                try {
-                    AntiHack.sanitizeValues(rawState); // ADDED: Clean data right before writing to storage
-
-                    // Update integrity hash before saving
-                    shadowHash = AntiHack.computeHash(state);
-
-                    const payload = {
-                        state: rawState,
-                        hash: shadowHash,
-                        savedAt: Date.now()
-                    };
-
-                    const serialized = btoa(JSON.stringify(payload));
-                    localStorage.setItem(this.STORAGE_KEY, serialized);
-
-                    const nowStr = new Date().toLocaleTimeString();
-                    document.getElementById('sec-last-save-time').innerText = nowStr;
-                    document.getElementById('save-status-text').innerText = isAuto ? "AUTO-SAVED" : "SAVED";
-
-                    if (!isAuto) {
-                        showToast("Game state saved successfully!", "success");
-                    }
-                    AntiHack.logConsole(`Game saved successfully (${isAuto ? 'Auto' : 'Manual'}).`, "text-accentGreen");
-                } catch (err) {
-                    console.error("Save Error:", err);
-                    showToast("Failed to save game data!", "error");
-                }
-            },
-
-            loadGame() {
-                try {
-                    const raw = localStorage.getItem(this.STORAGE_KEY);
-                    if (!raw) {
-                        AntiHack.logConsole("No previous save found. Starting fresh card journey.");
-                        return false;
-                    }
-
-                    const decoded = JSON.parse(atob(raw));
-                    if (!decoded || !decoded.state) return false;
-
-                    // Validate loaded hash
-                    const computed = AntiHack.computeHash(decoded.state);
-                    if (decoded.hash && decoded.hash !== computed) {
-                        AntiHack.logConsole("Save file hash mismatch! File might be edited externally.", "text-accentRed");
-                    }
-
-                    // Apply state safely
-                    Object.assign(rawState, DEFAULT_STATE, decoded.state);
-                    AntiHack.sanitizeValues(rawState); // ADDED: Clean up anything that broke in the past save
-                    
-                    // Offline passive income calculation
-                    if (decoded.savedAt) {
-                        const offlineSec = Math.min(86400, Math.floor((Date.now() - decoded.savedAt) / 1000));
-                        if (offlineSec > 5) {
-                            const offlineIncome = calculateTotalIncome() * offlineSec * 0.5; // 50% passive yield offline
-                            if (offlineIncome > 0 && isFinite(offlineIncome)) {
-                                state.balance += offlineIncome;
-                                showToast(`Welcome back! Earned $${offlineIncome.toLocaleString(undefined, {maximumFractionDigits:2})} while offline!`, "success");
-                            }
-                        }
-                    }
-
-                    AntiHack.lastVerifiedBalance = state.balance;
-                    AntiHack.lastVerifiedCrystals = state.crystals;
-                    shadowHash = AntiHack.computeHash(state);
-
-                    updateUI();
-                    AntiHack.logConsole("Encrypted save data loaded successfully.", "text-accentCyan");
-                    return true;
-                } catch (err) {
-                    console.error("Load Game Error:", err);
-                    AntiHack.logConsole("Save data corrupt. Using defaults.", "text-accentRed");
-                    return false;
-                }
-            },
-
-            exportSaveString() {
-                shadowHash = AntiHack.computeHash(state);
-                const payload = { state: rawState, hash: shadowHash, savedAt: Date.now() };
-                return btoa(JSON.stringify(payload));
-            },
-
-            importSaveString(code) {
-                try {
-                    const decoded = JSON.parse(atob(code.trim()));
-                    if (!decoded || !decoded.state) throw new Error("Invalid Save Code structure.");
-
-                    Object.assign(rawState, DEFAULT_STATE, decoded.state);
-                    AntiHack.sanitizeValues(rawState);
-
-                    AntiHack.lastVerifiedBalance = state.balance;
-                    AntiHack.lastVerifiedCrystals = state.crystals;
-                    
-                    this.saveGame(false);
-                    updateUI();
-                    renderCollection();
-                    renderMarket();
-                    showToast("Save Data imported successfully!", "success");
-                    return true;
-                } catch (err) {
-                    showToast("Failed to import save code. Code may be invalid or corrupt.", "error");
-                    return false;
-                }
-            },
-
-            resetGame() {
-                localStorage.removeItem(this.STORAGE_KEY);
-                Object.assign(rawState, DEFAULT_STATE);
-                // Ensure a random name is generated on reset if it was missing
-                rawState.playerName = "TRADER_" + Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-                AntiHack.lastVerifiedBalance = state.balance;
-                AntiHack.lastVerifiedCrystals = state.crystals;
-                this.saveGame(false);
-                updateUI();
-                renderCollection();
-                renderMarket();
-                showToast("Game data reset to factory defaults.", "info");
-            }
-        };
-
-        // --- STREAMING_CHUNK:Generating 30 Bot Traders... ---
-        const BOT_NAMES = ["CYBER_WHALE", "NEON_TRADER", "VOID_COLLECTOR", "QUANTUM_HACKER", "MECHA_PILOT", "CREDIT_KING", "HOLO_BARON", "DATA_SMUGGLER", "SYNTH_LORD", "ZERO_DAY", "GLITCH_FINDER", "OVERCLOCKER", "PROXY_SHIELD", "NET_RUNNER", "FUTURES_ORACLE"];
-        const BOT_AVATARS = ["ph-robot", "ph-lightning", "ph-alien", "ph-terminal-window", "ph-sword", "ph-currency-dollar", "ph-eye", "ph-bug", "ph-cpu", "ph-fingerprint"];
-        
-        function generateBots(count) {
-            const generated = [];
-            for (let i = 0; i < count; i++) {
-                const baseName = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
-                const suffix = Math.floor(Math.random() * 999).toString().padStart(3, '0');
-                const name = `${baseName}_${suffix}`;
-                
-                // Exponential-ish distribution for networth to simulate whales and plebs
-                const isWhale = Math.random() > 0.85;
-                const baseNetworth = isWhale ? 10000000 : 100000;
-                const multiplier = isWhale ? Math.random() * 5 : Math.random() * 10;
-                const networth = baseNetworth + (baseNetworth * multiplier);
-                
-                const level = Math.floor(Math.random() * (isWhale ? 50 : 20)) + 1;
-                const avatar = BOT_AVATARS[Math.floor(Math.random() * BOT_AVATARS.length)];
-
-                generated.push({ name, avatar, networth, level });
-            }
-            // Sort by networth to keep consistent ordering initially
-            return generated.sort((a, b) => b.networth - a.networth);
-        }
-
-        const BOTS = generateBots(30);
-
-        // --- ACTIVE AUCTION STATE ---
-        let currentAuction = null;
-        let auctionTimer = 30;
-        let auctionInterval = null;
-
-        // --- STREAMING_CHUNK:Defining core utility functions... ---
-        function calculateTotalIncome() {
-            let total = 0;
-            for (const [cardId, qty] of Object.entries(state.inventory)) {
-                if (qty > 0 && CARDS[cardId]) {
-                    total += CARDS[cardId].income * qty;
-                }
-            }
-            return isFinite(total) ? total : 0;
-        }
-
-        function calculateNetWorth() {
-            let worth = state.balance;
-            for (const [cardId, qty] of Object.entries(state.inventory)) {
-                if (qty > 0 && CARDS[cardId]) {
-                    worth += CARDS[cardId].currentPrice * qty;
-                }
-            }
-            return isFinite(worth) ? worth : 0;
-        }
-
-        function showToast(message, type = "info") {
-            const container = document.getElementById('notification-container');
-            const toast = document.createElement('div');
+        const generateCards = () => {
+            const prefixes = ['Quantum', 'Neon', 'Cyber', 'Void', 'Aero', 'Chrono', 'Mecha', 'Bio', 'Plasma', 'Nano', 'Echo', 'Glitch'];
+            const nouns = ['Dragon', 'Knight', 'Core', 'Matrix', 'Engine', 'Serpent', 'Wraith', 'Phoenix', 'Oracle', 'Colossus', 'Proxy', 'Node'];
             
-            let bg = "bg-black text-white";
-            if (type === "success") bg = "bg-accentGreen text-black";
-            if (type === "error") bg = "bg-accentRed text-white";
-            if (type === "crystal") bg = "bg-accentPurple text-white";
-
-            toast.className = `toast ${bg} p-3 font-black-custom text-xs brutal-border shadow-brutal flex items-center gap-2 uppercase`;
-            toast.innerHTML = `<i class="ph ph-bell text-lg"></i> <span>${message}</span>`;
-
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(10px)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        function addXP(amount) {
-            state.xp += amount;
-            const needed = state.level * 500;
-            if (state.xp >= needed) {
-                state.xp -= needed;
-                state.level++;
-                state.crystals += 25;
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                showToast(`LEVEL UP! REACHED LEVEL ${state.level}! (+25 💎)`, "crystal");
-            }
-        }
-
-        function createCardElement(card, qty = 0, isInteractive = true) {
-            const rarity = RARITIES[card.rarity];
-            const div = document.createElement('div');
-            div.className = `trading-card rarity-${card.rarity} ${card.rarity === 'legendary' || card.rarity === 'mythic' || card.rarity === 'voidTier' ? 'is-foil' : ''}`;
+            let idCounter = 1;
+            let cards = [];
             
-            div.innerHTML = `
-                <div class="p-2 bg-black text-white flex justify-between items-center text-[10px] font-black-custom border-b-2 border-black">
-                    <span class="truncate pr-1">${card.name}</span>
-                    <span class="bg-white text-black px-1 border border-black">${rarity.name}</span>
-                </div>
-                <div class="card-art-area">
-                    <div class="holo-overlay"></div>
-                    <i class="ph ${card.icon} text-5xl text-black/80 drop-shadow-[2px_2px_0_rgba(255,255,255,1)]"></i>
-                </div>
-                <div class="p-2 bg-white flex flex-col justify-between border-t-2 border-black gap-1 text-[10px] font-bold">
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-500">${card.category}</span>
-                        <span class="text-accentGreen font-black-custom">+$${card.income}/s</span>
-                    </div>
-                    <div class="flex justify-between items-center border-t border-gray-200 pt-1">
-                        <span class="text-xs font-black-custom">$${Math.floor(card.currentPrice).toLocaleString()}</span>
-                        ${qty > 0 ? `<span class="bg-accent px-1.5 py-0.5 border border-black font-black-custom text-xs">x${qty}</span>` : ''}
-                    </div>
-                </div>
-            `;
-
-            if (isInteractive) {
-                div.addEventListener('click', () => openTradeModal(card));
-            }
-            return div;
-        }
-
-        // --- STREAMING_CHUNK:Implementing UI rendering functions... ---
-        function updateUI() {
-            document.getElementById('ui-balance').innerText = `$${state.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            document.getElementById('ui-crystals').innerText = `${state.crystals} 💎`;
-            
-            const income = calculateTotalIncome();
-            document.getElementById('ui-income').innerText = income.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-            document.getElementById('ui-player-level').innerText = state.level;
-            document.getElementById('ui-xp-text').innerText = `${state.xp} / ${state.level * 500}`;
-            document.getElementById('ui-xp-bar').style.width = `${Math.min(100, (state.xp / (state.level * 500)) * 100)}%`;
-            
-            // Update Username
-            document.getElementById('ui-player-name').innerText = state.playerName;
-
-            // Dashboard Metrics
-            document.getElementById('dash-col-value').innerText = `$${calculateNetWorth().toLocaleString(undefined, {maximumFractionDigits:0})}`;
-            
-            const uniqueOwned = Object.values(state.inventory).filter(q => q > 0).length;
-            document.getElementById('dash-unique').innerText = `${uniqueOwned} / ${Object.keys(CARDS).length}`;
-            document.getElementById('dash-bots-count').innerText = BOTS.length;
-            document.getElementById('dash-arena-wins').innerText = state.arenaWins;
-        }
-
-        function renderMarket() {
-            const grid = document.getElementById('market-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            const rarityFilter = document.getElementById('market-filter-rarity').value;
-            const catFilter = document.getElementById('market-filter-category').value;
-            const search = document.getElementById('global-search-input').value.toLowerCase();
-
-            Object.values(CARDS).forEach(card => {
-                if (rarityFilter !== 'all' && card.rarity !== rarityFilter) return;
-                if (catFilter !== 'all' && card.category !== catFilter) return;
-                if (search && !card.name.toLowerCase().includes(search) && !card.category.toLowerCase().includes(search)) return;
-
-                const ownedQty = state.inventory[card.id] || 0;
-                const cardEl = createCardElement(card, ownedQty, true);
-                grid.appendChild(cardEl);
-            });
-        }
-
-        function renderCollection() {
-            const grid = document.getElementById('collection-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            const rarityFilter = document.getElementById('collection-filter-rarity').value;
-            const catFilter = document.getElementById('collection-filter-category').value;
-            const sortMode = document.getElementById('collection-sort').value;
-
-            let ownedCards = Object.entries(state.inventory)
-                .filter(([id, qty]) => qty > 0 && CARDS[id])
-                .map(([id, qty]) => ({ ...CARDS[id], qty }));
-
-            if (rarityFilter !== 'all') ownedCards = ownedCards.filter(c => c.rarity === rarityFilter);
-            if (catFilter !== 'all') ownedCards = ownedCards.filter(c => c.category === catFilter);
-
-            if (sortMode === 'value') ownedCards.sort((a, b) => b.currentPrice - a.currentPrice);
-            if (sortMode === 'income') ownedCards.sort((a, b) => b.income - a.income);
-            if (sortMode === 'qty') ownedCards.sort((a, b) => b.qty - a.qty);
-
-            if (ownedCards.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center p-8 font-black-custom text-gray-400 text-xl">NO CARDS FOUND IN YOUR COLLECTION MATCHING FILTERS.</div>`;
-                return;
-            }
-
-            ownedCards.forEach(card => {
-                const el = createCardElement(card, card.qty, true);
-                grid.appendChild(el);
-            });
-        }
-
-        function renderCrates() {
-            const grid = document.getElementById('crates-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            CRATES.forEach(crate => {
-                const card = document.createElement('div');
-                card.className = "brutal-box p-5 bg-white flex flex-col justify-between hover:-translate-y-1 transition-transform";
-                
-                const isCrystal = crate.currency === 'crystals';
-                const costTag = isCrystal ? `${crate.cost} 💎` : `$${crate.cost.toLocaleString()}`;
-
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-center mb-3">
-                            <i class="ph ${crate.icon} text-5xl text-black"></i>
-                            <span class="font-black-custom text-lg bg-accent px-2 py-0.5 border-2 border-black">${costTag}</span>
-                        </div>
-                        <h3 class="font-black-custom text-xl uppercase mb-1">${crate.name}</h3>
-                        <p class="text-xs font-bold text-gray-600 mb-4">${crate.desc}</p>
-                    </div>
-                    <button class="brutal-btn w-full py-3 bg-black text-white font-black-custom hover:bg-accent hover:text-black btn-open-crate" data-crate="${crate.id}">
-                        PURCHASE & UNBOX
-                    </button>
-                `;
-
-                card.querySelector('.btn-open-crate').addEventListener('click', () => openCrateModal(crate));
-                grid.appendChild(card);
-            });
-        }
-
-        // --- STREAMING_CHUNK:Implementing Crate Unboxing logic... ---
-        function openCrateModal(crate) {
-            const cost = crate.cost;
-            if (crate.currency === 'crystals') {
-                if (state.crystals < cost) { showToast("Not enough Crystals!", "error"); return; }
-                state.crystals -= cost;
-            } else {
-                if (state.balance < cost) { showToast("Not enough Cash balance!", "error"); return; }
-                state.balance -= cost;
-            }
-
-            const modal = document.getElementById('modal-crate-open');
-            modal.classList.remove('hidden');
-
-            document.getElementById('crate-title').innerText = `DECRYPTING ${crate.name}...`;
-            document.getElementById('crate-visual').classList.remove('hidden');
-            document.getElementById('spinner-container').classList.add('hidden');
-            document.getElementById('card-reveal-container').classList.add('hidden');
-            document.getElementById('reveal-info').classList.add('hidden');
-
-            const visual = document.getElementById('crate-visual');
-            const handleTap = () => {
-                visual.removeEventListener('click', handleTap);
-                visual.classList.add('hidden');
-                runCrateSpinner(crate);
-            };
-            visual.addEventListener('click', handleTap);
-        }
-
-        function runCrateSpinner(crate) {
-            const spinnerContainer = document.getElementById('spinner-container');
-            const track = document.getElementById('spinner-track');
-            spinnerContainer.classList.remove('hidden');
-            track.innerHTML = '';
-
-            // Generate pool of potential cards
-            const pool = Object.values(CARDS).filter(c => crate.rarities.includes(c.rarity));
-            
-            // Generate 40 random items for spinner animation
-            const items = [];
-            for (let i = 0; i < 40; i++) {
-                const randCard = pool[Math.floor(Math.random() * pool.length)];
-                items.push(randCard);
-            }
-
-            // The winning card is item index 35
-            const winningCard = items[35];
-
-            items.forEach((c, idx) => {
-                const cardDiv = document.createElement('div');
-                cardDiv.className = `spinner-card trading-card rarity-${c.rarity}`;
-                cardDiv.innerHTML = `
-                    <div class="p-1 bg-black text-white text-[9px] font-black-custom border-b-2 border-black truncate">${c.name}</div>
-                    <div class="card-art-area"><i class="ph ${c.icon} text-3xl"></i></div>
-                `;
-                track.appendChild(cardDiv);
-            });
-
-            // Trigger smooth CSS translate animation
-            track.style.transition = 'none';
-            track.style.transform = 'translateX(0px)';
-            
-            setTimeout(() => {
-                const cardWidth = 148; // 140px width + 8px margin
-                const winnerOffset = (35 * cardWidth) - (spinnerContainer.offsetWidth / 2) + (cardWidth / 2);
-                
-                track.style.transition = 'transform 5s cubic-bezier(0.15, 0.9, 0.2, 1)';
-                track.style.transform = `translateX(-${winnerOffset}px)`;
-            }, 100);
-
-            setTimeout(() => {
-                // Reveal reward card
-                spinnerContainer.classList.add('hidden');
-                
-                // Add card to inventory
-                state.inventory[winningCard.id] = (state.inventory[winningCard.id] || 0) + 1;
-                addXP(100);
-
-                const revealContainer = document.getElementById('card-reveal-container');
-                const cardHolder = document.getElementById('revealed-card');
-                revealContainer.classList.remove('hidden');
-                cardHolder.innerHTML = '';
-                cardHolder.appendChild(createCardElement(winningCard, state.inventory[winningCard.id], false));
-
-                document.getElementById('reveal-name').innerText = winningCard.name;
-                document.getElementById('reveal-rarity').innerText = RARITIES[winningCard.rarity].name;
-                document.getElementById('reveal-income').innerText = winningCard.income;
-                document.getElementById('reveal-info').classList.remove('hidden');
-
-                confetti({ particleCount: 80, spread: 60, origin: { y: 0.5 } });
-                
-                // Save Game automatically on card unboxing
-                SaveSystem.saveGame(true);
-            }, 5500);
-        }
-        
-        // Fix for Accept Asset button
-        document.getElementById('btn-continue-crate').addEventListener('click', () => {
-            document.getElementById('modal-crate-open').classList.add('hidden');
-            renderCollection();
-            updateUI(); // Ensure dashboard recent pulls or counts update
-        });
-
-        // --- STREAMING_CHUNK:Implementing Trading and Forge logic... ---
-        let selectedTradeCard = null;
-        function openTradeModal(card) {
-            selectedTradeCard = card;
-            const modal = document.getElementById('modal-trade');
-            modal.classList.remove('hidden');
-
-            document.getElementById('trade-modal-title').innerText = `TRADE: ${card.name}`;
-            document.getElementById('trade-modal-price').innerText = `$${Math.floor(card.currentPrice).toLocaleString()}`;
-            
-            const cardHolder = document.getElementById('trade-modal-card');
-            cardHolder.innerHTML = '';
-            cardHolder.appendChild(createCardElement(card, state.inventory[card.id] || 0, false));
-
-            const owned = state.inventory[card.id] || 0;
-            document.getElementById('trade-modal-owned').innerText = owned;
-
-            const buyBtn = document.getElementById('btn-modal-buy');
-            const sellBtn = document.getElementById('btn-modal-sell');
-
-            buyBtn.classList.remove('hidden');
-            sellBtn.classList.remove('hidden');
-
-            buyBtn.onclick = () => {
-                if (state.balance < card.currentPrice) { showToast("Insufficient funds!", "error"); return; }
-                state.balance -= card.currentPrice;
-                state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
-                
-                // Slight demand price pump on buy
-                card.currentPrice *= 1.02;
-                
-                showToast(`Bought copy of ${card.name}!`, "success");
-                addXP(25);
-                openTradeModal(card);
-                renderMarket();
-                renderCollection();
-                SaveSystem.saveGame(true);
-            };
-
-            sellBtn.onclick = () => {
-                if (!state.inventory[card.id] || state.inventory[card.id] <= 0) { showToast("You do not own any copies!", "error"); return; }
-                state.inventory[card.id]--;
-                state.balance += card.currentPrice;
-                
-                // Slight dump price on sell
-                card.currentPrice *= 0.98;
-
-                showToast(`Sold 1 copy of ${card.name}!`, "info");
-                addXP(15);
-                openTradeModal(card);
-                renderMarket();
-                renderCollection();
-                SaveSystem.saveGame(true);
-            };
-        }
-
-        function renderForge() {
-            const invContainer = document.getElementById('forge-inventory');
-            if (!invContainer) return;
-            invContainer.innerHTML = '';
-
-            const fusible = Object.entries(state.inventory).filter(([id, qty]) => qty >= 3 && CARDS[id]);
-
-            if (fusible.length === 0) {
-                invContainer.innerHTML = `<div class="col-span-full text-center text-xs font-bold text-gray-500 p-4">NO CARDS WITH 3+ DUPLICATES. OPEN MORE CRATES!</div>`;
-                return;
-            }
-
-            fusible.forEach(([id, qty]) => {
-                const card = CARDS[id];
-                const item = document.createElement('div');
-                item.className = "brutal-box p-2 flex flex-col items-center justify-between bg-white hover:bg-accent/20 cursor-pointer";
-                item.innerHTML = `
-                    <i class="ph ${card.icon} text-3xl"></i>
-                    <span class="font-black-custom text-[10px] truncate w-full text-center">${card.name}</span>
-                    <span class="bg-black text-white text-[9px] px-1 font-bold">QTY: ${qty}</span>
-                `;
-                item.onclick = () => selectForgeCard(card);
-                invContainer.appendChild(item);
-            });
-        }
-
-        function selectForgeCard(card) {
-            const actionArea = document.getElementById('forge-action-area');
-            const currentRank = RARITIES[card.rarity].rank;
-            const nextRarityKey = Object.keys(RARITIES).find(k => RARITIES[k].rank === currentRank + 1);
-
-            if (!nextRarityKey) {
-                actionArea.innerHTML = `<div class="font-black-custom text-center text-accentRed">CANNOT FORGE VOID TIER CARDS FURTHER!</div>`;
-                return;
-            }
-
-            actionArea.innerHTML = `
-                <div class="flex items-center gap-6 mb-6">
-                    <div class="flex flex-col items-center">
-                        <span class="font-black-custom text-xs mb-1">CONSUME 3x COPIES</span>
-                        <div class="trading-card rarity-${card.rarity} w-28 h-36">
-                            <div class="card-art-area"><i class="ph ${card.icon} text-3xl"></i></div>
-                            <div class="p-1 bg-black text-white text-[9px] font-black-custom truncate">${card.name}</div>
-                        </div>
-                    </div>
-                    <i class="ph ph-arrow-right text-4xl text-accentRed animate-pulse"></i>
-                    <div class="flex flex-col items-center">
-                        <span class="font-black-custom text-xs mb-1">CRAFT 1x ${RARITIES[nextRarityKey].name}</span>
-                        <div class="trading-card rarity-${nextRarityKey} w-28 h-36 border-dashed border-4 border-black flex items-center justify-center bg-gray-100">
-                            <i class="ph ph-question text-4xl text-gray-400"></i>
-                        </div>
-                    </div>
-                </div>
-                <button id="btn-execute-forge" class="brutal-btn py-4 px-8 bg-accentRed text-white text-xl font-black-custom shadow-brutal">
-                    IGNITE FORGE (FUSE 3 CARDS)
-                </button>
-            `;
-
-            document.getElementById('btn-execute-forge').onclick = () => {
-                state.inventory[card.id] -= 3;
-                
-                const possibleCrafts = Object.values(CARDS).filter(c => c.rarity === nextRarityKey);
-                const crafted = possibleCrafts[Math.floor(Math.random() * possibleCrafts.length)];
-
-                state.inventory[crafted.id] = (state.inventory[crafted.id] || 0) + 1;
-                
-                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
-                showToast(`FORGE SUCCESSFUL! CRAFTED ${crafted.name}!`, "success");
-                addXP(250);
-
-                renderForge();
-                renderCollection();
-                SaveSystem.saveGame(true);
-            };
-        }
-
-        // --- STREAMING_CHUNK:Implementing Arena and Auction logic... ---
-        function renderArena() {
-            const playerCardsDiv = document.getElementById('arena-player-cards');
-            if (!playerCardsDiv) return;
-            playerCardsDiv.innerHTML = '';
-
-            const owned = Object.entries(state.inventory)
-                .filter(([id, q]) => q > 0 && CARDS[id])
-                .map(([id]) => CARDS[id])
-                .sort((a, b) => b.income - a.income)
-                .slice(0, 3);
-
-            let playerPower = 0;
-            owned.forEach(c => {
-                playerPower += c.income * 10 + RARITIES[c.rarity].rank * 50;
-                playerCardsDiv.appendChild(createCardElement(c, 0, false));
-            });
-
-            document.getElementById('arena-player-power').innerText = Math.floor(playerPower);
-
-            const botPower = Math.floor(playerPower * (0.7 + Math.random() * 0.5));
-            document.getElementById('arena-bot-power').innerText = botPower;
-
-            const fightBtn = document.getElementById('btn-arena-fight');
-            fightBtn.onclick = () => {
-                if (state.balance < 1000) { showToast("Arena Entry requires $1,000!", "error"); return; }
-                state.balance -= 1000;
-
-                const log = document.getElementById('arena-battle-log');
-                log.classList.remove('hidden');
-                log.innerText = "SIMULATING BATTLE ROUNDS...";
-
-                setTimeout(() => {
-                    log.classList.add('hidden');
-                    if (playerPower >= botPower) {
-                        state.crystals += 50;
-                        state.arenaWins++;
-                        confetti({ particleCount: 100 });
-                        showToast("VICTORY! EARNED +50 💎 CRYSTALS!", "success");
-                        addXP(300);
-                    } else {
-                        showToast("DEFEAT! YOUR SQUAD WAS OVERPOWERED.", "error");
-                    }
-                    renderArena();
-                    SaveSystem.saveGame(true);
-                }, 2000);
-            };
-        }
-
-        function startAuctionLoop() {
-            const allCards = Object.values(CARDS);
-            currentAuction = {
-                card: allCards[Math.floor(Math.random() * allCards.length)],
-                currentBid: 500,
-                highestBidder: "NO BIDS YET"
-            };
-
-            currentAuction.currentBid = Math.floor(currentAuction.card.baseValue * 0.8);
-            auctionTimer = 30;
-
-            const container = document.getElementById('auction-card-container');
-            if (container) {
-                container.innerHTML = '';
-                container.appendChild(createCardElement(currentAuction.card, 0, false));
-            }
-
-            document.getElementById('auction-current-bid').innerText = `$${currentAuction.currentBid.toLocaleString()}`;
-            document.getElementById('auction-highest-bidder').innerText = currentAuction.highestBidder;
-
-            if (auctionInterval) clearInterval(auctionInterval);
-            
-            auctionInterval = setInterval(() => {
-                auctionTimer--;
-                document.getElementById('auction-timer-display').innerText = `${auctionTimer}s`;
-
-                // Bot bidding simulation
-                if (Math.random() < 0.35 && auctionTimer > 3) {
-                    const randomBot = BOTS[Math.floor(Math.random() * BOTS.length)];
-                    currentAuction.currentBid = Math.floor(currentAuction.currentBid * 1.1);
-                    currentAuction.highestBidder = randomBot.name;
-
-                    document.getElementById('auction-current-bid').innerText = `$${currentAuction.currentBid.toLocaleString()}`;
-                    document.getElementById('auction-highest-bidder').innerText = currentAuction.highestBidder;
-
-                    const log = document.getElementById('auction-log');
-                    const entry = document.createElement('div');
-                    entry.className = "bg-white p-1.5 brutal-border flex justify-between";
-                    entry.innerHTML = `<span class="text-accentPurple">${randomBot.name}</span><span>$${currentAuction.currentBid.toLocaleString()}</span>`;
-                    log.prepend(entry);
-                }
-
-                if (auctionTimer <= 0) {
-                    clearInterval(auctionInterval);
-                    if (currentAuction.highestBidder === state.playerName) {
-                        state.inventory[currentAuction.card.id] = (state.inventory[currentAuction.card.id] || 0) + 1;
-                        confetti({ particleCount: 150 });
-                        showToast(`AUCTION WON! RECEIVED ${currentAuction.card.name}!`, "success");
-                        SaveSystem.saveGame(true);
-                    } else {
-                        showToast(`Auction ended. Won by ${currentAuction.highestBidder}`, "info");
-                    }
-                    setTimeout(startAuctionLoop, 4000);
-                }
-            }, 1000);
-        }
-
-        document.getElementById('btn-place-bid').onclick = () => {
-            if (!currentAuction) return;
-            const nextBid = Math.floor(currentAuction.currentBid * 1.1);
-            if (state.balance < nextBid) { showToast("Insufficient funds to bid!", "error"); return; }
-
-            state.balance -= (nextBid - (currentAuction.highestBidder === state.playerName ? currentAuction.currentBid : 0));
-            currentAuction.currentBid = nextBid;
-            currentAuction.highestBidder = state.playerName;
-
-            document.getElementById('auction-current-bid').innerText = `$${currentAuction.currentBid.toLocaleString()}`;
-            document.getElementById('auction-highest-bidder').innerText = currentAuction.highestBidder;
-
-            const log = document.getElementById('auction-log');
-            const entry = document.createElement('div');
-            entry.className = "bg-accent p-1.5 brutal-border flex justify-between";
-            entry.innerHTML = `<span>YOU</span><span>$${currentAuction.currentBid.toLocaleString()}</span>`;
-            log.prepend(entry);
-        };
-
-        // --- STREAMING_CHUNK:Implementing Leaderboard and Game Loop... ---
-        function renderLeaderboard() {
-            const list = document.getElementById('leaderboard-list');
-            if (!list) return;
-            list.innerHTML = '';
-
-            const userEntry = { name: `${state.playerName} (YOU)`, networth: calculateNetWorth(), level: state.level, isUser: true };
-            
-            // Periodically increase bot networth to simulate gameplay
-            if(Math.random() > 0.5) {
-                const randomBotIndex = Math.floor(Math.random() * BOTS.length);
-                BOTS[randomBotIndex].networth *= (1 + (Math.random() * 0.05));
-            }
-
-            const allTraders = [...BOTS, userEntry].sort((a, b) => b.networth - a.networth);
-
-            allTraders.forEach((t, rank) => {
-                const row = document.createElement('div');
-                row.className = `flex p-3 border-b-2 border-black items-center font-bold text-xs ${t.isUser ? 'bg-accent' : 'bg-white'}`;
-                row.innerHTML = `
-                    <div class="w-16 text-center font-black-custom text-sm">#${rank + 1}</div>
-                    <div class="flex-1 flex items-center gap-2">
-                        <i class="ph ${t.avatar || 'ph-user'} text-xl"></i>
-                        <span>${t.name}</span>
-                    </div>
-                    <div class="w-20 text-center hidden sm:block">${t.level}</div>
-                    <div class="w-32 text-right font-black-custom">$${Math.floor(t.networth).toLocaleString()}</div>
-                `;
-                list.appendChild(row);
-            });
-        }
-        
-        // --- Username Modal Logic ---
-        function setupUsernameModal() {
-            const nameElements = [document.getElementById('ui-player-name'), document.getElementById('ui-avatar-container')];
-            const modal = document.getElementById('modal-username');
-            const input = document.getElementById('username-input');
-            const btnSave = document.getElementById('btn-save-username');
-            const btnClose = document.querySelector('.close-username-modal');
-
-            nameElements.forEach(el => {
-                if(el) {
-                    el.addEventListener('click', () => {
-                        input.value = state.playerName;
-                        modal.classList.remove('hidden');
+            Object.keys(RARITIES).forEach((rarity) => {
+                let count = rarity === 'common' ? 20 : rarity === 'uncommon' ? 15 : rarity === 'rare' ? 10 : rarity === 'epic' ? 8 : rarity === 'legendary' ? 5 : rarity === 'mythic' ? 3 : 2;
+                for(let i=0; i<count; i++) {
+                    const p = prefixes[Math.floor(Math.random() * prefixes.length)];
+                    const n = nouns[Math.floor(Math.random() * nouns.length)];
+                    const basePrice = Math.floor(Math.random() * 50 + 10) * RARITIES[rarity].multiplier;
+                    cards.push({
+                        id: `card_${idCounter++}`,
+                        name: `${p} ${n}`,
+                        rarity: rarity,
+                        category: CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)],
+                        basePrice: basePrice,
+                        currentPrice: basePrice,
+                        income: Math.max(0.1, basePrice * 0.05).toFixed(1),
+                        icon: 'ph-cpu'
                     });
                 }
             });
+            return cards;
+        };
 
-            btnClose.addEventListener('click', () => modal.classList.add('hidden'));
-
-            btnSave.addEventListener('click', () => {
-                const newName = input.value.trim().toUpperCase();
-                if (newName.length < 3) {
-                    showToast("ID must be at least 3 characters", "error");
-                    return;
-                }
-                state.playerName = newName;
-                modal.classList.add('hidden');
-                showToast("Trader ID updated successfully!", "success");
-                SaveSystem.saveGame(true);
-                renderLeaderboard();
-            });
-        }
-
-        function gameLoop() {
-            setInterval(() => {
-                const income = calculateTotalIncome();
-                if (income > 0) {
-                    state.balance += income;
-                }
-                
-                // Simulate market volatility
-                Object.values(CARDS).forEach(card => {
-                    if (Math.random() < 0.05) { // 5% chance per second per card to change price slightly
-                        const volatility = 0.95 + (Math.random() * 0.1); // 0.95 to 1.05
-                        card.currentPrice = Math.max(card.baseValue * 0.5, card.currentPrice * volatility);
-                    }
-                });
-
-                // Anti-Hack Integrity Check every few seconds
-                if (Math.random() < 0.2) {
-                    AntiHack.validateStateIntegrity();
-                }
-
-                if (document.getElementById('screen-market').classList.contains('hidden') === false) {
-                    renderMarket();
-                }
-                
-                if (document.getElementById('screen-leaderboard').classList.contains('hidden') === false) {
-                    renderLeaderboard();
-                }
-
-            }, 1000);
+        const CARD_DB = generateCards();
+        
+        const formatMoney = (num) => '$' + Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        const notify = (msg, type='info') => {
+            const container = document.getElementById('notification-container');
+            const el = document.createElement('div');
+            let color = type === 'success' ? 'bg-accentGreen' : type === 'error' ? 'bg-accentRed text-white' : 'bg-black text-white';
+            el.className = `toast ${color} px-4 py-2 text-xs font-black-custom brutal-border border-white shadow-brutal translate-y-10 opacity-0`;
+            el.innerHTML = msg;
+            container.appendChild(el);
             
-            // Auto Save Loop
-            setInterval(() => {
-                SaveSystem.saveGame(true);
-            }, 30000); // 30 sec auto save
-        }
-
-        // --- STREAMING_CHUNK:Initializing Application and Event Listeners... ---
-        function initApp() {
-            // Build Filter Dropdowns
-            const rFilter = document.getElementById('market-filter-rarity');
-            const cFilter = document.getElementById('collection-filter-rarity');
-            Object.values(RARITIES).forEach(r => {
-                const opt = new Option(r.name, r.name.toLowerCase());
-                const opt2 = new Option(r.name, r.name.toLowerCase());
-                if(r.name !== "VOID TIER") { // keep value matching ID pattern
-                   opt.value = Object.keys(RARITIES).find(k=>RARITIES[k].name === r.name);
-                   opt2.value = opt.value;
-                } else {
-                   opt.value = "voidTier";
-                   opt2.value = "voidTier";
-                }
-                rFilter.add(opt);
-                cFilter.add(opt2);
+            requestAnimationFrame(() => {
+                el.classList.remove('translate-y-10', 'opacity-0');
             });
-
-            const cats = [...new Set(RAW_CARD_DATABASE.map(c => c.category))];
-            const mCatFilter = document.getElementById('market-filter-category');
-            const colCatFilter = document.getElementById('collection-filter-category');
-            cats.forEach(cat => {
-                mCatFilter.add(new Option(cat, cat));
-                colCatFilter.add(new Option(cat, cat));
-            });
-
-            // Nav Setup
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    document.querySelectorAll('.screen-content').forEach(s => s.classList.add('hidden'));
-                    const targetId = btn.getAttribute('data-target');
-                    document.getElementById(targetId).classList.remove('hidden');
-
-                    if (targetId === 'screen-market') renderMarket();
-                    if (targetId === 'screen-collection') renderCollection();
-                    if (targetId === 'screen-forge') renderForge();
-                    if (targetId === 'screen-arena') renderArena();
-                    if (targetId === 'screen-leaderboard') renderLeaderboard();
-                });
-            });
-
-            // Modals Close
-            document.querySelectorAll('.close-modal').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    btn.closest('.fixed').classList.add('hidden');
-                });
-            });
-
-            // Search & Filters
-            document.getElementById('global-search-input').addEventListener('input', () => {
-                if(!document.getElementById('screen-market').classList.contains('hidden')) renderMarket();
-            });
-            document.getElementById('market-filter-rarity').addEventListener('change', renderMarket);
-            document.getElementById('market-filter-category').addEventListener('change', renderMarket);
             
-            document.getElementById('collection-filter-rarity').addEventListener('change', renderCollection);
-            document.getElementById('collection-filter-category').addEventListener('change', renderCollection);
-            document.getElementById('collection-sort').addEventListener('change', renderCollection);
+            setTimeout(() => {
+                el.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => el.remove(), 200);
+            }, 3000);
+        };
 
-            // Daily Spin
-            document.getElementById('btn-daily-bonus').addEventListener('click', () => {
-                const now = Date.now();
-                if (now - state.lastDailySpin < 86400000) {
-                    const hoursLeft = Math.ceil((86400000 - (now - state.lastDailySpin)) / 3600000);
-                    showToast(`Next spin available in ${hoursLeft} hours.`, "error");
-                    return;
-                }
-                
-                const icon = document.getElementById('spin-icon');
-                icon.classList.add('spin-anim');
-                
-                setTimeout(() => {
-                    icon.classList.remove('spin-anim');
-                    const reward = Math.floor(Math.random() * 5000) + 1000;
-                    state.balance += reward;
-                    state.lastDailySpin = now;
-                    showToast(`SPUN THE WHEEL! WON $${reward.toLocaleString()}!`, "success");
-                    SaveSystem.saveGame(true);
-                }, 1000);
-            });
-
-            document.getElementById('btn-claim-vault').addEventListener('click', () => {
-                 showToast("Vault is currently locked. Requires Level 10.", "error");
-            });
-
-            // Setup Username Modal
-            setupUsernameModal();
-
-            // SAVE I/O Listeners
-            const ioModal = document.getElementById('modal-save-io');
-            const ioTextarea = document.getElementById('save-io-textarea');
-            let isExportMode = true;
-
-            document.getElementById('btn-sec-export').addEventListener('click', () => {
-                isExportMode = true;
-                ioModal.classList.remove('hidden');
-                document.getElementById('save-io-title').innerHTML = `<i class="ph ph-export text-accentCyan"></i> EXPORT SAVE DATA`;
-                document.getElementById('save-io-desc').innerText = "Copy this encrypted string to back up your progress.";
-                ioTextarea.value = SaveSystem.exportSaveString();
-                ioTextarea.readOnly = true;
-                const actionBtn = document.getElementById('btn-save-io-action');
-                actionBtn.innerText = "COPY TO CLIPBOARD";
-                actionBtn.className = "brutal-btn flex-1 py-3 bg-accentCyan text-black font-black-custom";
-            });
-
-            document.getElementById('btn-sec-import').addEventListener('click', () => {
-                isExportMode = false;
-                ioModal.classList.remove('hidden');
-                document.getElementById('save-io-title').innerHTML = `<i class="ph ph-import text-accent"></i> IMPORT SAVE DATA`;
-                document.getElementById('save-io-desc').innerText = "Paste your previously exported save string below. THIS WILL OVERWRITE CURRENT DATA.";
-                ioTextarea.value = "";
-                ioTextarea.readOnly = false;
-                const actionBtn = document.getElementById('btn-save-io-action');
-                actionBtn.innerText = "IMPORT & OVERWRITE";
-                actionBtn.className = "brutal-btn flex-1 py-3 bg-accentRed text-white font-black-custom";
-            });
-
-            document.querySelectorAll('.close-save-modal').forEach(b => b.addEventListener('click', () => ioModal.classList.add('hidden')));
-
-            document.getElementById('btn-save-io-action').addEventListener('click', () => {
-                if (isExportMode) {
-                    ioTextarea.select();
-                    document.execCommand('copy');
-                    showToast("Save string copied to clipboard!", "success");
-                } else {
-                    const code = ioTextarea.value;
-                    if (!code) { showToast("Please paste a save code first.", "error"); return; }
-                    if (SaveSystem.importSaveString(code)) {
-                        ioModal.classList.add('hidden');
-                    }
+        const updateUI = () => {
+            document.getElementById('ui-balance').textContent = formatMoney(state.balance);
+            document.getElementById('ui-crystals').textContent = `${state.crystals} 💎`;
+            document.getElementById('ui-player-name').textContent = state.name;
+            document.getElementById('ui-player-level').textContent = state.level;
+            
+            // Calculate Income
+            let income = 0;
+            let uniqueCount = 0;
+            Object.keys(state.inventory).forEach(id => {
+                const qty = state.inventory[id];
+                if(qty > 0) {
+                    uniqueCount++;
+                    const card = CARD_DB.find(c => c.id === id);
+                    if(card) income += parseFloat(card.income) * qty;
                 }
             });
-
-            document.getElementById('btn-sec-save-now').addEventListener('click', () => SaveSystem.saveGame(false));
-            document.getElementById('btn-quick-save').addEventListener('click', () => SaveSystem.saveGame(false));
-            document.getElementById('save-status-badge').addEventListener('click', () => {
-                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-                document.querySelector('[data-target="screen-security"]').classList.add('active');
-                document.querySelectorAll('.screen-content').forEach(s => s.classList.add('hidden'));
-                document.getElementById('screen-security').classList.remove('hidden');
-            });
-
-            document.getElementById('btn-sec-reset').addEventListener('click', () => {
-                if(confirm("CRITICAL WARNING: This will permanently wipe all cards, balance, and progress. Are you absolutely sure?")) {
-                    SaveSystem.resetGame();
+            
+            document.getElementById('ui-income').textContent = income.toFixed(1);
+            document.getElementById('dash-unique').textContent = `${uniqueCount} / ${CARD_DB.length}`;
+            document.getElementById('dash-arena-wins').textContent = state.arenaWins;
+            
+            // Calc Net Worth
+            let netWorth = state.balance;
+            Object.keys(state.inventory).forEach(id => {
+                if(state.inventory[id] > 0) {
+                    const card = CARD_DB.find(c => c.id === id);
+                    if(card) netWorth += card.currentPrice * state.inventory[id];
                 }
             });
+            document.getElementById('dash-col-value').textContent = formatMoney(netWorth);
 
-            // Anti-Hack Action Handlers
-            document.getElementById('btn-anti-hack-revert').addEventListener('click', () => {
-                document.getElementById('modal-anti-hack-alert').classList.add('hidden');
-                if(!SaveSystem.loadGame()) {
-                    SaveSystem.resetGame();
+            // XP
+            const nextLevel = state.level * 1000;
+            if(state.xp >= nextLevel) {
+                state.xp -= nextLevel;
+                state.level++;
+                state.crystals += 50;
+                notify(`LEVEL UP! REACHED LVL ${state.level}. +50 CRYSTALS!`, 'success');
+            }
+            document.getElementById('ui-xp-text').textContent = `${Math.floor(state.xp)} / ${nextLevel}`;
+            document.getElementById('ui-xp-bar').style.width = `${Math.min(100, (state.xp / nextLevel) * 100)}%`;
+        };
+
+        const saveGame = () => {
+            state.lastSave = Date.now();
+            localStorage.setItem('cardMarketSave_v2', btoa(JSON.stringify(state)));
+            
+            const timeStr = new Date().toLocaleTimeString();
+            document.getElementById('sec-last-save-time').textContent = timeStr;
+            document.getElementById('save-status-text').textContent = 'SAVED';
+            
+            // Pseudo checksum
+            const checksum = '0x' + Math.abs(state.balance * state.level).toString(16).toUpperCase();
+            document.getElementById('sec-checksum-sig').textContent = checksum.substring(0, 10);
+            
+            setTimeout(() => { document.getElementById('save-status-text').textContent = 'AUTO-SAVED'; }, 2000);
+            
+            logSecurity(`State Checksum [${checksum.substring(0,10)}] Written to encrypted store.`);
+        };
+
+        const loadGame = () => {
+            const data = localStorage.getItem('cardMarketSave_v2');
+            if(data) {
+                try {
+                    const parsed = JSON.parse(atob(data));
+                    state = { ...state, ...parsed };
+                    notify('Secure Save Loaded', 'success');
+                } catch(e) {
+                    notify('Save file corrupted.', 'error');
                 }
-                showToast("State restored from secure save.", "info");
-                document.getElementById('anti-hack-badge').className = "bg-accentGreen text-black px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom text-[10px] flex items-center gap-1 cursor-pointer";
-                document.getElementById('anti-hack-status-text').innerText = "SHIELD ACTIVE";
-            });
-
-            document.getElementById('btn-anti-hack-purge').addEventListener('click', () => {
-                document.getElementById('modal-anti-hack-alert').classList.add('hidden');
-                // Force sync variables to baseline
-                state.balance = AntiHack.lastVerifiedBalance;
-                state.crystals = AntiHack.lastVerifiedCrystals;
-                SaveSystem.saveGame(false);
-                showToast("Anomalies purged. Continuing securely.", "success");
-                document.getElementById('anti-hack-badge').className = "bg-accentGreen text-black px-2 py-0.5 brutal-border border-white shrink-0 font-black-custom text-[10px] flex items-center gap-1 cursor-pointer";
-                document.getElementById('anti-hack-status-text').innerText = "SHIELD ACTIVE";
-            });
-
-
-            // Boot Sequence
-            SaveSystem.loadGame();
-            renderCrates();
-            renderMarket();
-            renderCollection();
+            }
             updateUI();
-            gameLoop();
-            startAuctionLoop();
-        }
+        };
 
-        window.onload = initApp;
+        const logSecurity = (msg) => {
+            const log = document.getElementById('sec-security-console-log');
+            const div = document.createElement('div');
+            div.className = 'text-white';
+            div.textContent = `[SENTINEL]: ${msg}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        };
+
+        let lastTick = Date.now();
+        setInterval(() => {
+            const now = Date.now();
+            const dt = (now - lastTick) / 1000;
+            lastTick = now;
+
+            // Anti speed-hack
+            if(dt > 5) {
+                logSecurity('Time warp detected. Delta neutralized.');
+                return;
+            }
+            
+            // Passive income
+            let income = 0;
+            Object.keys(state.inventory).forEach(id => {
+                if(state.inventory[id] > 0) {
+                    const card = CARD_DB.find(c => c.id === id);
+                    if(card) income += parseFloat(card.income) * state.inventory[id];
+                }
+            });
+            
+            if(income > 0) {
+                state.balance += income * dt;
+                state.xp += (income * dt) * 0.1;
+                updateUI();
+            }
+
+            // Market fluctuation
+            if(Math.random() < 0.1) {
+                const target = CARD_DB[Math.floor(Math.random() * CARD_DB.length)];
+                const change = 1 + (Math.random() * 0.2 - 0.1); // +/- 10%
+                target.currentPrice = Math.max(target.basePrice * 0.1, target.currentPrice * change);
+                renderMarketGrid();
+            }
+
+        }, 1000);
+
+        setInterval(saveGame, 10000); // Auto save 10s
+
+        const renderCardHTML = (card, isFoil = false, context = 'market', qty = 0) => {
+            const rInfo = RARITIES[card.rarity];
+            let extraHTML = '';
+            
+            if(context === 'collection') {
+                extraHTML = `<div class="absolute -top-2 -right-2 bg-black text-white font-black-custom text-xs px-2 py-1 border-2 border-white z-20">x${qty}</div>`;
+            }
+
+            return `
+                <div class="trading-card rarity-${card.rarity} ${isFoil ? 'is-foil' : ''}" data-id="${card.id}" onclick="handleCardClick('${card.id}', '${context}')">
+                    ${extraHTML}
+                    <div class="card-art-area">
+                        <i class="ph ${card.icon} text-6xl text-white/50 absolute drop-shadow-md"></i>
+                        <div class="holo-overlay"></div>
+                    </div>
+                    <div class="bg-white p-2 border-t-4 border-black flex-shrink-0 relative z-10 flex flex-col justify-between h-20">
+                        <div>
+                            <div class="text-[9px] font-black-custom ${rInfo.textClass} uppercase">${rInfo.name} // ${card.category}</div>
+                            <div class="font-black-custom text-xs sm:text-sm truncate uppercase leading-tight">${card.name}</div>
+                        </div>
+                        <div class="flex justify-between items-end mt-1">
+                            <div class="text-[10px] font-bold bg-black text-white px-1.5">+${card.income}/s</div>
+                            <div class="text-xs font-black-custom text-accentGreen price-val">${formatMoney(card.currentPrice)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        const renderMarketGrid = () => {
+            const grid = document.getElementById('market-grid');
+            if(!grid) return;
+            
+            const fRarity = document.getElementById('market-filter-rarity').value;
+            const fCat = document.getElementById('market-filter-category').value;
+            
+            let html = '';
+            CARD_DB.forEach(c => {
+                if(fRarity !== 'all' && c.rarity !== fRarity) return;
+                if(fCat !== 'all' && c.category !== fCat) return;
+                html += renderCardHTML(c, false, 'market');
+            });
+            grid.innerHTML = html;
+        };
+
+        const renderCollection = () => {
+            const grid = document.getElementById('collection-grid');
+            if(!grid) return;
+            
+            const fRarity = document.getElementById('collection-filter-rarity').value;
+            const fCat = document.getElementById('collection-filter-category').value;
+            const sort = document.getElementById('collection-sort').value;
+            
+            let owned = Object.keys(state.inventory).filter(id => state.inventory[id] > 0).map(id => {
+                return { ...CARD_DB.find(c => c.id === id), qty: state.inventory[id] };
+            });
+
+            if(sort === 'value') owned.sort((a,b) => b.currentPrice - a.currentPrice);
+            else if(sort === 'income') owned.sort((a,b) => parseFloat(b.income) - parseFloat(a.income));
+            else if(sort === 'qty') owned.sort((a,b) => b.qty - a.qty);
+
+            let html = '';
+            owned.forEach(c => {
+                if(fRarity !== 'all' && c.rarity !== fRarity) return;
+                if(fCat !== 'all' && c.category !== fCat) return;
+                html += renderCardHTML(c, c.rarity === 'mythic' || c.rarity==='voidTier', 'collection', c.qty);
+            });
+            
+            if(html === '') html = '<div class="col-span-full text-center p-8 font-bold text-gray-500">NO CARDS FOUND MATCHING CRITERIA.</div>';
+            grid.innerHTML = html;
+        };
+
+        const renderCrates = () => {
+            const grid = document.getElementById('crates-grid');
+            grid.innerHTML = CRATES.map(crate => `
+                <div class="brutal-box p-4 bg-white flex flex-col justify-between items-center group cursor-pointer hover:bg-gray-50" onclick="initiateCrateOpen('${crate.id}')">
+                    <div class="w-full text-center border-b-2 border-black pb-2 mb-4">
+                        <div class="font-black-custom text-xl uppercase">${crate.name}</div>
+                    </div>
+                    <div class="${crate.color} w-32 h-32 brutal-border flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform shadow-brutal">
+                        <i class="ph ${crate.icon} text-5xl text-black"></i>
+                    </div>
+                    <button class="brutal-btn w-full py-3 bg-accent text-black font-black-custom flex justify-center items-center gap-2">
+                        BUY <span class="bg-black text-white px-2 py-0.5 text-xs">${formatMoney(crate.price)}</span>
+                    </button>
+                    
+                    <div class="mt-4 w-full text-[9px] font-bold text-gray-500 flex flex-col gap-0.5 uppercase border-t-2 border-gray-200 pt-2">
+                        <div class="flex justify-between"><span>Common:</span> <span>${crate.chances.common}%</span></div>
+                        <div class="flex justify-between text-green-600"><span>Uncommon:</span> <span>${crate.chances.uncommon}%</span></div>
+                        <div class="flex justify-between text-blue-600"><span>Rare:</span> <span>${crate.chances.rare}%</span></div>
+                        <div class="flex justify-between text-purple-600"><span>Epic:</span> <span>${crate.chances.epic}%</span></div>
+                        <div class="flex justify-between text-orange-500"><span>Legendary:</span> <span>${crate.chances.legendary}%</span></div>
+                        ${crate.chances.mythic > 0 ? `<div class="flex justify-between text-red-600"><span>Mythic:</span> <span>${crate.chances.mythic}%</span></div>` : ''}
+                        ${crate.chances.voidTier > 0 ? `<div class="flex justify-between text-cyan-500"><span>Void Tier:</span> <span>${crate.chances.voidTier}%</span></div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        let spinningCrate = false;
+        
+        const initiateCrateOpen = (crateId) => {
+            if(spinningCrate) return;
+            const crate = CRATES.find(c => c.id === crateId);
+            if(state.balance < crate.price) {
+                notify('INSUFFICIENT FUNDS', 'error');
+                return;
+            }
+            
+            state.balance -= crate.price;
+            updateUI();
+            
+            document.getElementById('modal-crate-open').classList.remove('hidden');
+            document.getElementById('crate-title').textContent = `${crate.name} ACQUIRED`;
+            
+            const visual = document.getElementById('crate-visual');
+            visual.className = `w-48 h-48 sm:w-64 sm:h-64 brutal-box ${crate.color} flex flex-col items-center justify-center cursor-pointer relative hover:-translate-y-2 transition-transform mb-6 group mx-auto`;
+            visual.innerHTML = `
+                <i class="ph ${crate.icon} text-7xl sm:text-9xl text-black transition-transform group-hover:scale-110"></i>
+                <div class="absolute -bottom-5 bg-black text-white font-black-custom text-xs sm:text-sm px-4 py-2 brutal-border border-white shadow-[4px_4px_0_#000] whitespace-nowrap">TAP TO DECRYPT</div>
+            `;
+            visual.style.display = 'flex';
+            
+            document.getElementById('spinner-container').classList.add('hidden');
+            document.getElementById('card-reveal-container').classList.add('hidden');
+            document.getElementById('reveal-info').classList.add('hidden'); // Fix based on prompt
+
+            visual.onclick = () => startSpinner(crate);
+        };
+
+        const startSpinner = (crate) => {
+            spinningCrate = true;
+            document.getElementById('crate-visual').style.display = 'none';
+            document.getElementById('spinner-container').classList.remove('hidden');
+            
+            // Hide the accept button aggressively so they don't click it early
+            document.getElementById('reveal-info').classList.add('hidden');
+            document.getElementById('reveal-info').style.display = 'none';
+            document.getElementById('btn-continue-crate').disabled = true;
+
+            const track = document.getElementById('spinner-track');
+            track.innerHTML = '';
+            track.style.transition = 'none';
+            track.style.transform = 'translateX(0px)';
+
+            // Generate sequence
+            const sequence = [];
+            for(let i=0; i<40; i++) {
+                sequence.push(rollCard(crate));
+            }
+            const winningCard = rollCard(crate);
+            sequence[35] = winningCard; // The winner is at index 35
+
+            // Render dummy cards
+            sequence.forEach(c => {
+                const el = document.createElement('div');
+                el.className = 'spinner-card';
+                el.innerHTML = renderCardHTML(c, false, 'spinner');
+                track.appendChild(el);
+            });
+
+            // Trigger animation
+            setTimeout(() => {
+                const cardWidth = 148; // 140 width + 8 margin
+                const targetX = -(35 * cardWidth) + (window.innerWidth < 640 ? 100 : 200); // Adjust center
+                
+                track.style.transition = 'transform 4s cubic-bezier(0.15, 0.85, 0.2, 1)';
+                track.style.transform = `translateX(${targetX}px)`;
+                
+                // Sound effect mock
+                let ticks = 0;
+                let tickInt = setInterval(() => {
+                    ticks++;
+                    if(ticks > 35) clearInterval(tickInt);
+                }, 4000/35);
+
+                setTimeout(() => {
+                    // Highlight winner
+                    track.children[35].classList.add('winner');
+                    
+                    setTimeout(() => {
+                        showReveal(winningCard);
+                    }, 1000);
+                    
+                }, 4100);
+            }, 100);
+        };
+
+        const rollCard = (crate) => {
+            let rand = Math.random() * 100;
+            let sum = 0;
+            let chosenRarity = 'common';
+            
+            for(const [rarity, chance] of Object.entries(crate.chances)) {
+                sum += chance;
+                if(rand <= sum) {
+                    chosenRarity = rarity;
+                    break;
+                }
+            }
+            
+            const pool = CARD_DB.filter(c => c.rarity === chosenRarity);
+            return pool[Math.floor(Math.random() * pool.length)];
+        };
+
+        const showReveal = (card) => {
+            document.getElementById('spinner-container').classList.add('hidden');
+            const revealContainer = document.getElementById('card-reveal-container');
+            revealContainer.classList.remove('hidden');
+            
+            document.getElementById('revealed-card').innerHTML = renderCardHTML(card, card.rarity==='mythic' || card.rarity==='voidTier', 'reveal');
+            
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: [themeColor(card.rarity), '#ffffff', '#000000']
+            });
+
+            // Add to inventory
+            state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
+            state.xp += RARITIES[card.rarity].multiplier * 5;
+            
+            const info = document.getElementById('reveal-info');
+            document.getElementById('reveal-name').textContent = card.name;
+            document.getElementById('reveal-rarity').textContent = RARITIES[card.rarity].name;
+            document.getElementById('reveal-rarity').className = `px-4 py-1.5 font-bold uppercase brutal-border shadow-brutal-sm text-black ${RARITIES[card.rarity].color}`;
+            document.getElementById('reveal-income').textContent = card.income;
+
+            // Wait briefly before allowing collection to prevent prompt's reported scamming feel
+            setTimeout(() => {
+                info.classList.remove('hidden');
+                info.style.display = 'flex';
+                document.getElementById('btn-continue-crate').disabled = false;
+                updateUI();
+                renderCollection();
+            }, 800);
+        };
+
+        document.getElementById('btn-continue-crate').onclick = () => {
+            document.getElementById('modal-crate-open').classList.add('hidden');
+            spinningCrate = false;
+        };
+
+        const themeColor = (rarity) => {
+            const map = { common:'#a0a0a0', uncommon:'#00cc66', rare:'#3366ff', epic:'#cc33ff', legendary:'#ff9900', mythic:'#ff0000', voidTier:'#00f0ff' };
+            return map[rarity] || '#ffffff';
+        };
+
+        let activeTradeCardId = null;
+
+        window.handleCardClick = (id, context) => {
+            if(spinningCrate) return;
+            const card = CARD_DB.find(c => c.id === id);
+            if(!card) return;
+            
+            activeTradeCardId = id;
+            const modal = document.getElementById('modal-trade');
+            modal.classList.remove('hidden');
+            
+            document.getElementById('trade-modal-title').textContent = card.name;
+            document.getElementById('trade-modal-card').innerHTML = renderCardHTML(card, false, 'modal');
+            document.getElementById('trade-modal-price').textContent = formatMoney(card.currentPrice);
+            
+            const btnBuy = document.getElementById('btn-modal-buy');
+            const btnSell = document.getElementById('btn-modal-sell');
+            
+            btnBuy.classList.remove('hidden');
+            btnBuy.textContent = `BUY (${formatMoney(card.currentPrice)})`;
+            
+            const qty = state.inventory[id] || 0;
+            if(qty > 0) {
+                btnSell.classList.remove('hidden');
+                btnSell.textContent = `SELL (HAVE ${qty})`;
+            } else {
+                btnSell.classList.add('hidden');
+            }
+        };
+
+        document.getElementById('btn-modal-buy').onclick = () => {
+            const card = CARD_DB.find(c => c.id === activeTradeCardId);
+            if(state.balance >= card.currentPrice) {
+                state.balance -= card.currentPrice;
+                state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
+                card.currentPrice *= 1.05; // Price goes up
+                notify(`Bought ${card.name}`, 'success');
+                handleCardClick(activeTradeCardId, 'market');
+                updateUI();
+                renderMarketGrid();
+                renderCollection();
+            } else {
+                notify('Insufficient Funds!', 'error');
+            }
+        };
+
+        document.getElementById('btn-modal-sell').onclick = () => {
+            const qty = state.inventory[activeTradeCardId] || 0;
+            if(qty > 0) {
+                const card = CARD_DB.find(c => c.id === activeTradeCardId);
+                state.balance += card.currentPrice * 0.9; // 10% market fee
+                state.inventory[card.id]--;
+                card.currentPrice *= 0.95; // Price goes down
+                notify(`Sold ${card.name}`, 'info');
+                handleCardClick(activeTradeCardId, 'market');
+                updateUI();
+                renderMarketGrid();
+                renderCollection();
+            }
+        };
+
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.onclick = (e) => {
+                e.target.closest('div[id^="modal-"]').classList.add('hidden');
+            };
+        });
+
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                
+                const targetId = e.currentTarget.getAttribute('data-target');
+                document.querySelectorAll('.screen-content').forEach(s => s.classList.add('hidden'));
+                document.getElementById(targetId).classList.remove('hidden');
+                
+                if(targetId === 'screen-market') renderMarketGrid();
+                if(targetId === 'screen-collection') renderCollection();
+            });
+        });
+
+        document.getElementById('btn-quick-save').onclick = saveGame;
+        document.getElementById('btn-sec-save-now').onclick = saveGame;
+        
+        document.getElementById('btn-sec-reset').onclick = () => {
+            if(confirm("WARNING: This will wipe all data. Proceed?")) {
+                localStorage.removeItem('cardMarketSave_v2');
+                location.reload();
+            }
+        };
+
+        document.getElementById('ui-avatar-container').onclick = () => {
+            const newName = prompt("Enter new Trader Name:", state.name);
+            if(newName && newName.trim().length > 0) {
+                state.name = newName.trim().substring(0, 15).toUpperCase();
+                updateUI();
+            }
+        };
+
+        document.getElementById('btn-change-leaderboard-name').onclick = document.getElementById('ui-avatar-container').onclick;
+
+        // Initialize UI Filters
+        const populateFilters = () => {
+            let rOpts = '<option value="all">ALL RARITIES</option>';
+            Object.keys(RARITIES).forEach(k => rOpts += `<option value="${k}">${RARITIES[k].name}</option>`);
+            document.getElementById('market-filter-rarity').innerHTML = rOpts;
+            document.getElementById('collection-filter-rarity').innerHTML = rOpts;
+
+            let cOpts = '<option value="all">ALL CATEGORIES</option>';
+            CATEGORIES.forEach(c => cOpts += `<option value="${c}">${c}</option>`);
+            document.getElementById('market-filter-category').innerHTML = cOpts;
+            document.getElementById('collection-filter-category').innerHTML = cOpts;
+        };
+
+        // Simulated network chat
+        setInterval(() => {
+            const msgs = [
+                "TRADER_X just pulled a MYTHIC!",
+                "Market prices on Cyber cards surging.",
+                "Anyone buying Void Tiers?",
+                "Arena matchmaking is sweaty today.",
+                "System: Botnet sweep completed."
+            ];
+            const chat = document.getElementById('global-chat');
+            const msg = document.createElement('div');
+            msg.className = "p-2 bg-white brutal-border shadow-brutal-sm border-l-4 border-accentCyan text-xs animate-pulse";
+            msg.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+            chat.prepend(msg);
+            if(chat.children.length > 10) chat.removeChild(chat.lastChild);
+        }, 5000);
+
+        // Simulated Leaderboard
+        const populateLeaderboard = () => {
+            const list = document.getElementById('leaderboard-list');
+            let dummy = [];
+            for(let i=0; i<9; i++) {
+                dummy.push({ name: `USER_${Math.floor(Math.random()*9999)}`, lvl: Math.floor(Math.random()*50)+1, nw: Math.random()*1000000 });
+            }
+            
+            // Calc player NW
+            let playerNw = state.balance;
+            Object.keys(state.inventory).forEach(id => {
+                if(state.inventory[id] > 0) {
+                    const card = CARD_DB.find(c => c.id === id);
+                    if(card) playerNw += card.currentPrice * state.inventory[id];
+                }
+            });
+
+            dummy.push({ name: state.name, lvl: state.level, nw: playerNw, isPlayer: true });
+            dummy.sort((a,b) => b.nw - a.nw);
+
+            list.innerHTML = dummy.map((p, i) => `
+                <div class="flex p-3 ${p.isPlayer ? 'bg-accent text-black font-black-custom border-4 border-black' : 'bg-white hover:bg-gray-50'} items-center">
+                    <div class="w-16 text-center font-bold">#${i+1}</div>
+                    <div class="flex-1 font-bold ${p.isPlayer ? 'text-xl' : ''}">${p.name}</div>
+                    <div class="w-20 text-center hidden sm:block font-bold">LVL ${p.lvl}</div>
+                    <div class="w-36 text-right font-black-custom text-accentGreen">${formatMoney(p.nw)}</div>
+                </div>
+            `).join('');
+
+            const pRank = dummy.findIndex(p => p.isPlayer) + 1;
+            document.getElementById('dash-player-rank').textContent = `#${pRank}`;
+        };
+        setInterval(populateLeaderboard, 15000);
+
+        // Startup
+        populateFilters();
+        renderCrates();
+        loadGame();
+        populateLeaderboard();
+        
+        // Attach re-render on filter change
+        document.getElementById('market-filter-rarity').onchange = renderMarketGrid;
+        document.getElementById('market-filter-category').onchange = renderMarketGrid;
+        document.getElementById('collection-filter-rarity').onchange = renderCollection;
+        document.getElementById('collection-filter-category').onchange = renderCollection;
+        document.getElementById('collection-sort').onchange = renderCollection;
+        
+        // Anti-hack visual pulse
+        setInterval(() => {
+            document.getElementById('anti-hack-badge').classList.toggle('bg-accentGreen');
+            document.getElementById('anti-hack-badge').classList.toggle('bg-white');
+        }, 1500);
+
+        // Daily Bonus
+        document.getElementById('btn-daily-bonus').onclick = function() {
+            if(this.disabled) return;
+            state.balance += 5000;
+            state.crystals += 10;
+            notify('DAILY SPIN CLAIMED: +$5,000 / +10 💎', 'success');
+            updateUI();
+            this.disabled = true;
+            this.innerHTML = '<i class="ph ph-check text-lg"></i> CLAIMED';
+            setTimeout(() => {
+                this.disabled = false;
+                this.innerHTML = '<i class="ph ph-spinner-gap text-lg"></i> DAILY SPIN';
+            }, 60000 * 5); // 5 min cooldown for demo
+        };
+
+        // Vault
+        document.getElementById('btn-claim-vault').onclick = function() {
+            notify('VAULT LOCKED. REQUIRES VIP PASS.', 'error');
+        };
 
     </script>
 </body>

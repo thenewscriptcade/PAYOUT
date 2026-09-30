@@ -330,7 +330,7 @@
                 </button>
                 <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left bg-accentCyan/30 relative" data-target="screen-forge">
                     <i class="ph ph-fire text-lg text-accentRed"></i> <span>THE FORGE</span>
-                    <span id="forge-nav-timer" class="ml-auto bg-accentRed text-white text-[9px] font-black-custom px-1 border border-black hidden animate-pulse">00:30</span>
+                    <span id="forge-nav-timer" class="ml-auto bg-black text-white text-[9px] font-black-custom px-1 border border-black">READY</span>
                 </button>
                 <button class="nav-item brutal-btn flex items-center gap-3 px-3.5 py-2 text-xs text-left bg-accentRed/20" data-target="screen-arena">
                     <i class="ph ph-sword text-lg text-accentRed"></i> <span>BATTLE ARENA</span>
@@ -444,6 +444,10 @@
                         <p class="font-bold text-xs text-gray-600 mt-1">Real-time dynamic stock values driven by simulated trader volume.</p>
                     </div>
                     <div class="flex items-center gap-4 bg-gray-100 p-2 brutal-border">
+                        <div class="text-xs font-bold text-center border-r-2 border-black pr-4">
+                            <span class="text-gray-500 uppercase block text-[9px]">NEXT RESTOCK</span>
+                            <span id="market-reset-timer" class="text-accentRed font-black-custom text-sm">30:00</span>
+                        </div>
                         <div class="text-xs font-bold">
                             <span class="text-gray-500 uppercase block text-[9px]">MARKET STATUS</span>
                             <span class="text-accentGreen font-black-custom uppercase animate-pulse">● ACTIVE TRADING</span>
@@ -517,7 +521,7 @@
                         <h2 class="font-black-custom text-2xl sm:text-3xl uppercase flex items-center gap-2">
                             <i class="ph ph-fire text-accentRed"></i> THE FORGE / FUSION LAB
                         </h2>
-                        <p class="font-bold text-xs text-gray-600 mt-0.5">Burn 3 duplicate cards to craft a higher tier card! (1 Hour Forge Timer)</p>
+                        <p class="font-bold text-xs text-gray-600 mt-0.5">Burn 3 duplicate cards to craft a higher tier card! (Forge Cooldown Active)</p>
                     </div>
                     <div id="forge-status-badge" class="bg-black text-white text-xs font-black-custom px-3 py-1.5 brutal-border border-accent flex items-center gap-2">
                         <i class="ph ph-timer text-accent font-bold"></i> <span id="forge-status-text">FORGE READY</span>
@@ -526,13 +530,19 @@
 
                 <div class="flex flex-col lg:flex-row flex-1 gap-6 min-h-0">
                     <div class="w-full lg:w-1/2 flex flex-col brutal-border bg-gray-50 h-64 lg:h-auto">
-                        <div class="p-3 bg-black text-white font-black-custom uppercase text-sm border-b-4 border-black sticky top-0 z-10">AVAILABLE FOR FUSION (QTY 3+)</div>
+                        <div class="p-3 bg-black text-white font-black-custom uppercase text-sm border-b-4 border-black sticky top-0 z-10 flex justify-between items-center">
+                            <span>AVAILABLE FOR FUSION (QTY 3+)</span>
+                            <span class="text-[10px] bg-accentRed text-white px-2 py-0.5">NEED 3 COPIES</span>
+                        </div>
                         <div class="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 gap-4" id="forge-inventory">
                             <!-- Populated dynamically -->
                         </div>
                     </div>
                     <div class="w-full lg:w-1/2 flex flex-col items-center justify-center brutal-border bg-white p-6 relative overflow-hidden flex-1" id="forge-action-area">
-                        <div class="text-center text-gray-400 font-black-custom text-xl" id="forge-empty-state">SELECT A CARD WITH 3+ COPIES TO FORGE</div>
+                        <div class="text-center text-gray-400 font-black-custom text-xl flex flex-col items-center gap-2" id="forge-empty-state">
+                            <i class="ph ph-question text-6xl opacity-50"></i>
+                            SELECT A CARD WITH 3+ COPIES TO FORGE
+                        </div>
                         <!-- Forge action content dynamically injected here -->
                     </div>
                 </div>
@@ -750,7 +760,6 @@
                 </div>
             </div>
 
-            <!-- This div is completely hidden during spinner to prevent scamming/annoyance -->
             <div id="reveal-info" class="hidden flex-col items-center w-full mt-4 sm:mt-8 z-20">
                 <div class="font-black-custom text-xl sm:text-3xl text-center mb-3 px-6 py-2 brutal-border w-full max-w-md bg-black text-white shadow-brutal" id="reveal-name">CARD NAME</div>
                 <div class="flex flex-wrap gap-2 sm:gap-4 mb-4 w-full justify-center text-xs sm:text-sm">
@@ -771,9 +780,10 @@
             <div class="font-bold text-center mb-4">
                 MARKET VALUE: <span id="trade-modal-price" class="text-accentGreen text-xl font-black-custom">$0</span>
             </div>
-            <div class="flex gap-4">
+            <div class="flex gap-2 flex-wrap">
                 <button id="btn-modal-buy" class="brutal-btn flex-1 py-3 bg-accentGreen text-black font-black-custom hidden">BUY COPY</button>
                 <button id="btn-modal-sell" class="brutal-btn flex-1 py-3 bg-accentRed text-white font-black-custom hidden">SELL COPY</button>
+                <button id="btn-modal-forge" class="brutal-btn flex-1 py-3 bg-accentPurple text-white font-black-custom hidden"><i class="ph ph-fire"></i> FORGE (3 COPIES)</button>
             </div>
         </div>
     </div>
@@ -781,7 +791,6 @@
     <div id="notification-container" class="fixed bottom-4 right-4 flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
-        // CONFIG & STATE
         const RARITIES = {
             common: { color: 'bg-common', name: 'COMMON', multiplier: 1, textClass: 'text-gray-500' },
             uncommon: { color: 'bg-uncommon', name: 'UNCOMMON', multiplier: 2.5, textClass: 'text-green-600' },
@@ -794,7 +803,6 @@
 
         const CATEGORIES = ['HACKER', 'CYBER', 'MECHA', 'BIO', 'CRYPTO', 'VOID'];
 
-        // Crate configuration - Modified as per user prompt to enforce price/odds gap
         const CRATES = [
             { id: 'c1', name: 'NOVICE CRATE', price: 100, icon: 'ph-package', color: 'bg-common', chances: { common: 80, uncommon: 19, rare: 1, epic: 0, legendary: 0, mythic: 0, voidTier: 0 } },
             { id: 'c2', name: 'EXPERT BOX', price: 2500, icon: 'ph-briefcase', color: 'bg-rare', chances: { common: 40, uncommon: 40, rare: 15, epic: 5, legendary: 0, mythic: 0, voidTier: 0 } },
@@ -869,7 +877,6 @@
             document.getElementById('ui-player-name').textContent = state.name;
             document.getElementById('ui-player-level').textContent = state.level;
             
-            // Calculate Income
             let income = 0;
             let uniqueCount = 0;
             Object.keys(state.inventory).forEach(id => {
@@ -885,7 +892,6 @@
             document.getElementById('dash-unique').textContent = `${uniqueCount} / ${CARD_DB.length}`;
             document.getElementById('dash-arena-wins').textContent = state.arenaWins;
             
-            // Calc Net Worth
             let netWorth = state.balance;
             Object.keys(state.inventory).forEach(id => {
                 if(state.inventory[id] > 0) {
@@ -895,7 +901,6 @@
             });
             document.getElementById('dash-col-value').textContent = formatMoney(netWorth);
 
-            // XP
             const nextLevel = state.level * 1000;
             if(state.xp >= nextLevel) {
                 state.xp -= nextLevel;
@@ -915,7 +920,6 @@
             document.getElementById('sec-last-save-time').textContent = timeStr;
             document.getElementById('save-status-text').textContent = 'SAVED';
             
-            // Pseudo checksum
             const checksum = '0x' + Math.abs(state.balance * state.level).toString(16).toUpperCase();
             document.getElementById('sec-checksum-sig').textContent = checksum.substring(0, 10);
             
@@ -947,19 +951,51 @@
             log.scrollTop = log.scrollHeight;
         };
 
+        let marketTimer = 1800; // 30 minutes in seconds
+        let marketStock = {};
+
+        // Updated Stock Rules: Max stock 4 for lower tiers, and high tiers hardly ever go into stock
+        const stockRules = {
+            common: { chance: 0.65, maxStock: 4 },
+            uncommon: { chance: 0.45, maxStock: 3 },
+            rare: { chance: 0.25, maxStock: 2 },
+            epic: { chance: 0.08, maxStock: 2 },
+            legendary: { chance: 0.02, maxStock: 1 },
+            mythic: { chance: 0.008, maxStock: 1 },
+            voidTier: { chance: 0.002, maxStock: 1 }
+        };
+
+        const refreshMarketStock = () => {
+            marketStock = {};
+            CARD_DB.forEach(c => {
+                const rule = stockRules[c.rarity] || { chance: 0.1, maxStock: 2 };
+                if (Math.random() < rule.chance) {
+                    marketStock[c.id] = Math.min(4, Math.floor(Math.random() * rule.maxStock) + 1);
+                }
+            });
+            
+            // Just ensure at least common/uncommon items are in stock if an unlucky roll occurred
+            if(Object.keys(marketStock).length < 5) {
+                CARD_DB.filter(c => c.rarity === 'common' || c.rarity === 'uncommon').slice(0, 5).forEach(c => {
+                    marketStock[c.id] = Math.min(4, Math.floor(Math.random() * 3) + 1);
+                });
+            }
+
+            renderMarketGrid();
+            notify("MARKET HAS BEEN RESTOCKED WITH NEW ASSETS", "info");
+        };
+
         let lastTick = Date.now();
         setInterval(() => {
             const now = Date.now();
             const dt = (now - lastTick) / 1000;
             lastTick = now;
 
-            // Anti speed-hack
             if(dt > 5) {
                 logSecurity('Time warp detected. Delta neutralized.');
                 return;
             }
             
-            // Passive income
             let income = 0;
             Object.keys(state.inventory).forEach(id => {
                 if(state.inventory[id] > 0) {
@@ -974,28 +1010,48 @@
                 updateUI();
             }
 
-            // Market fluctuation
+            // Price Fluctuations
             if(Math.random() < 0.1) {
                 const target = CARD_DB[Math.floor(Math.random() * CARD_DB.length)];
-                const change = 1 + (Math.random() * 0.2 - 0.1); // +/- 10%
+                const change = 1 + (Math.random() * 0.2 - 0.1); 
                 target.currentPrice = Math.max(target.basePrice * 0.1, target.currentPrice * change);
-                renderMarketGrid();
+                if (document.getElementById('screen-market').classList.contains('hidden') === false) {
+                    renderMarketGrid();
+                }
+            }
+            
+            // Market Timer Logic Update
+            marketTimer--;
+            if (marketTimer <= 0) {
+                marketTimer = 1800; // Reset to 30 min
+                refreshMarketStock();
+            }
+            
+            const timerEl = document.getElementById('market-reset-timer');
+            if (timerEl) {
+                const mins = Math.floor(marketTimer / 60);
+                const secs = marketTimer % 60;
+                timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
 
         }, 1000);
 
-        setInterval(saveGame, 10000); // Auto save 10s
+        setInterval(saveGame, 10000); 
 
         const renderCardHTML = (card, isFoil = false, context = 'market', qty = 0) => {
             const rInfo = RARITIES[card.rarity];
             let extraHTML = '';
             
             if(context === 'collection') {
-                extraHTML = `<div class="absolute -top-2 -right-2 bg-black text-white font-black-custom text-xs px-2 py-1 border-2 border-white z-20">x${qty}</div>`;
+                extraHTML = `<div class="absolute -top-2 -right-2 bg-black text-white font-black-custom text-xs px-2 py-1 border-2 border-white z-20 shadow-brutal-sm">x${qty}</div>`;
+            } else if (context === 'forge') {
+                extraHTML = `<div class="absolute -top-2 -right-2 bg-accentRed text-white font-black-custom text-xs px-2 py-1 border-2 border-white z-20 shadow-brutal-sm">HAVE ${qty}</div>`;
             }
 
+            const allowModalClick = (context !== 'forge-preview' && context !== 'forge');
+
             return `
-                <div class="trading-card rarity-${card.rarity} ${isFoil ? 'is-foil' : ''}" data-id="${card.id}" onclick="handleCardClick('${card.id}', '${context}')">
+                <div class="trading-card rarity-${card.rarity} ${isFoil ? 'is-foil' : ''}" data-id="${card.id}" ${allowModalClick ? `onclick="handleCardClick('${card.id}', '${context}')"` : ''}>
                     ${extraHTML}
                     <div class="card-art-area">
                         <i class="ph ${card.icon} text-6xl text-white/50 absolute drop-shadow-md"></i>
@@ -1026,8 +1082,19 @@
             CARD_DB.forEach(c => {
                 if(fRarity !== 'all' && c.rarity !== fRarity) return;
                 if(fCat !== 'all' && c.category !== fCat) return;
-                html += renderCardHTML(c, false, 'market');
+                
+                // Only show cards currently in stock
+                if(!marketStock[c.id] || marketStock[c.id] <= 0) return;
+                
+                html += `
+                    <div class="relative group">
+                        <div class="absolute -top-3 -left-3 bg-accent text-black font-black-custom text-[11px] px-2 py-1 z-20 border-2 border-black shadow-[2px_2px_0_#000]">STOCK: ${marketStock[c.id]}</div>
+                        ${renderCardHTML(c, false, 'market')}
+                    </div>
+                `;
             });
+            
+            if(html === '') html = '<div class="col-span-full text-center p-12 font-black-custom text-gray-400 text-lg">NO CARDS CURRENTLY IN STOCK FOR THIS FILTER. WAIT FOR MARKET RESTOCK.</div>';
             grid.innerHTML = html;
         };
 
@@ -1056,6 +1123,144 @@
             
             if(html === '') html = '<div class="col-span-full text-center p-8 font-bold text-gray-500">NO CARDS FOUND MATCHING CRITERIA.</div>';
             grid.innerHTML = html;
+        };
+
+        const RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic', 'voidTier'];
+        let selectedForgeCardId = null;
+        let forgeTimer = 0; 
+
+        const renderForge = () => {
+            const invContainer = document.getElementById('forge-inventory');
+            if(!invContainer) return;
+            
+            let html = '';
+            Object.keys(state.inventory).forEach(id => {
+                if (state.inventory[id] >= 3) {
+                    const c = CARD_DB.find(card => card.id === id);
+                    if (c && c.rarity !== 'voidTier') { // Max tier cannot be forged further
+                        html += `
+                            <div class="flex flex-col items-center gap-1 bg-white p-2 brutal-border">
+                                <div class="cursor-pointer hover:scale-105 transition-transform w-full" onclick="selectForgeCard('${id}')">
+                                    ${renderCardHTML(c, false, 'forge', state.inventory[id])}
+                                </div>
+                                <button class="brutal-btn w-full py-1.5 bg-accentRed text-white text-xs font-black-custom mt-1 hover:bg-red-600" onclick="selectForgeCard('${id}')">
+                                    <i class="ph ph-fire"></i> SELECT FOR FORGE
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+            });
+            
+            if (html === '') {
+                invContainer.innerHTML = '<div class="col-span-full text-center text-xs font-bold text-gray-500 py-12 px-4 border-2 border-dashed border-gray-300">NO CARDS ELIGIBLE FOR FORGE<br>(REQUIRES 3 OR MORE COPIES OF NON-VOID TIER CARDS)</div>';
+            } else {
+                invContainer.innerHTML = html;
+            }
+        };
+
+        window.selectForgeCard = (id) => {
+            if (forgeTimer > 0) {
+                notify("FORGE IS ON COOLDOWN!", "error");
+                return;
+            }
+            selectedForgeCardId = id;
+            const c = CARD_DB.find(card => card.id === id);
+            const actionArea = document.getElementById('forge-action-area');
+            
+            const currentRarityIdx = RARITY_ORDER.indexOf(c.rarity);
+            const nextRarity = RARITY_ORDER[currentRarityIdx + 1];
+            
+            actionArea.innerHTML = `
+                <div class="flex flex-col items-center gap-6 w-full h-full justify-center">
+                    <h3 class="font-black-custom text-3xl uppercase bg-black text-white px-4 py-1 inline-block transform -rotate-1">FUSION INITIATED</h3>
+                    <div class="flex items-center gap-2 sm:gap-6 w-full justify-center">
+                        <div class="scale-[0.8] sm:scale-100">${renderCardHTML(c, false, 'forge-preview')}</div>
+                        <div class="flex flex-col items-center mx-2">
+                            <div class="text-3xl sm:text-5xl font-black-custom text-accentRed">x3</div>
+                            <i class="ph ph-arrow-right text-3xl sm:text-5xl font-black"></i>
+                        </div>
+                        <div class="w-32 h-44 sm:w-40 sm:h-56 border-4 border-dashed border-black flex items-center justify-center bg-gray-100 flex-col text-center p-3 relative shadow-brutal">
+                            <i class="ph ph-question text-5xl sm:text-6xl mb-2 text-gray-400"></i>
+                            <span class="text-[10px] sm:text-xs font-black-custom uppercase border-b-2 border-black pb-1">RANDOM RESULT</span>
+                            <span class="text-sm sm:text-base font-black-custom ${RARITIES[nextRarity].textClass} mt-1">${RARITIES[nextRarity].name}</span>
+                        </div>
+                    </div>
+                    <button class="brutal-btn bg-accentRed text-white py-4 px-10 text-xl sm:text-2xl mt-4 w-full max-w-sm flex items-center justify-center gap-2" onclick="executeForge('${id}')">
+                        <i class="ph ph-fire text-3xl"></i> BURN & CRAFT NOW
+                    </button>
+                </div>
+            `;
+        };
+
+        window.executeForge = (id) => {
+            if(state.inventory[id] < 3) return;
+            if(forgeTimer > 0) return;
+            
+            // Deduct 3 copies
+            state.inventory[id] -= 3;
+            
+            // Find a random card of nextRarity
+            const c = CARD_DB.find(card => card.id === id);
+            const currentRarityIdx = RARITY_ORDER.indexOf(c.rarity);
+            const nextRarity = RARITY_ORDER[currentRarityIdx + 1];
+            
+            const pool = CARD_DB.filter(card => card.rarity === nextRarity);
+            const reward = pool[Math.floor(Math.random() * pool.length)];
+            
+            state.inventory[reward.id] = (state.inventory[reward.id] || 0) + 1;
+            
+            notify(`FORGE SUCCESS! Crafted ${reward.name} (${RARITIES[nextRarity].name})`, "success");
+            
+            // Trigger visual cooldown
+            forgeTimer = 30; // 30 second cooldown
+            
+            const badge = document.getElementById('forge-status-badge');
+            badge.classList.replace('bg-black', 'bg-accentRed');
+            badge.classList.replace('text-white', 'text-black');
+            
+            const navBadge = document.getElementById('forge-nav-timer');
+            navBadge.classList.replace('bg-black', 'bg-accentRed');
+            navBadge.classList.remove('hidden');
+            navBadge.classList.add('animate-pulse');
+            
+            const updateForgeTimer = () => {
+                if (forgeTimer <= 0) {
+                    document.getElementById('forge-status-text').textContent = "FORGE READY";
+                    badge.classList.replace('bg-accentRed', 'bg-black');
+                    badge.classList.replace('text-black', 'text-white');
+                    navBadge.classList.replace('bg-accentRed', 'bg-black');
+                    navBadge.classList.remove('animate-pulse');
+                    navBadge.textContent = "READY";
+                    
+                    document.getElementById('forge-action-area').innerHTML = `
+                        <div class="text-center text-gray-400 font-black-custom text-xl flex flex-col items-center gap-2" id="forge-empty-state">
+                            <i class="ph ph-question text-6xl opacity-50"></i>
+                            SELECT A CARD WITH 3+ COPIES TO FORGE
+                        </div>
+                    `;
+                    renderForge();
+                    return;
+                }
+                document.getElementById('forge-status-text').textContent = `COOLING... ${forgeTimer}s`;
+                navBadge.textContent = `00:${forgeTimer.toString().padStart(2, '0')}`;
+                forgeTimer--;
+                setTimeout(updateForgeTimer, 1000);
+            };
+            
+            updateForgeTimer();
+            
+            const actionArea = document.getElementById('forge-action-area');
+            actionArea.innerHTML = `
+                <div class="text-center flex flex-col items-center animate-pulse">
+                    <i class="ph ph-fire text-8xl text-accentRed mb-4"></i>
+                    <div class="font-black-custom text-3xl bg-black text-white px-4 py-2 border-4 border-accentRed shadow-brutal">FUSION CORE COOLING</div>
+                    <div class="text-sm font-bold mt-2">WAIT FOR COOLDOWN TO CRAFT AGAIN</div>
+                </div>
+            `;
+            
+            updateUI();
+            renderForge();
         };
 
         const renderCrates = () => {
@@ -1111,7 +1316,7 @@
             
             document.getElementById('spinner-container').classList.add('hidden');
             document.getElementById('card-reveal-container').classList.add('hidden');
-            document.getElementById('reveal-info').classList.add('hidden'); // Fix based on prompt
+            document.getElementById('reveal-info').classList.add('hidden');
 
             visual.onclick = () => startSpinner(crate);
         };
@@ -1121,7 +1326,6 @@
             document.getElementById('crate-visual').style.display = 'none';
             document.getElementById('spinner-container').classList.remove('hidden');
             
-            // Hide the accept button aggressively so they don't click it early
             document.getElementById('reveal-info').classList.add('hidden');
             document.getElementById('reveal-info').style.display = 'none';
             document.getElementById('btn-continue-crate').disabled = true;
@@ -1131,15 +1335,13 @@
             track.style.transition = 'none';
             track.style.transform = 'translateX(0px)';
 
-            // Generate sequence
             const sequence = [];
             for(let i=0; i<40; i++) {
                 sequence.push(rollCard(crate));
             }
             const winningCard = rollCard(crate);
-            sequence[35] = winningCard; // The winner is at index 35
+            sequence[35] = winningCard;
 
-            // Render dummy cards
             sequence.forEach(c => {
                 const el = document.createElement('div');
                 el.className = 'spinner-card';
@@ -1147,29 +1349,18 @@
                 track.appendChild(el);
             });
 
-            // Trigger animation
             setTimeout(() => {
-                const cardWidth = 148; // 140 width + 8 margin
-                const targetX = -(35 * cardWidth) + (window.innerWidth < 640 ? 100 : 200); // Adjust center
+                const cardWidth = 148; 
+                const targetX = -(35 * cardWidth) + (window.innerWidth < 640 ? 100 : 200);
                 
                 track.style.transition = 'transform 4s cubic-bezier(0.15, 0.85, 0.2, 1)';
                 track.style.transform = `translateX(${targetX}px)`;
                 
-                // Sound effect mock
-                let ticks = 0;
-                let tickInt = setInterval(() => {
-                    ticks++;
-                    if(ticks > 35) clearInterval(tickInt);
-                }, 4000/35);
-
                 setTimeout(() => {
-                    // Highlight winner
                     track.children[35].classList.add('winner');
-                    
                     setTimeout(() => {
                         showReveal(winningCard);
                     }, 1000);
-                    
                 }, 4100);
             }, 100);
         };
@@ -1205,7 +1396,6 @@
                 colors: [themeColor(card.rarity), '#ffffff', '#000000']
             });
 
-            // Add to inventory
             state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
             state.xp += RARITIES[card.rarity].multiplier * 5;
             
@@ -1215,7 +1405,6 @@
             document.getElementById('reveal-rarity').className = `px-4 py-1.5 font-bold uppercase brutal-border shadow-brutal-sm text-black ${RARITIES[card.rarity].color}`;
             document.getElementById('reveal-income').textContent = card.income;
 
-            // Wait briefly before allowing collection to prevent prompt's reported scamming feel
             setTimeout(() => {
                 info.classList.remove('hidden');
                 info.style.display = 'flex';
@@ -1252,9 +1441,23 @@
             
             const btnBuy = document.getElementById('btn-modal-buy');
             const btnSell = document.getElementById('btn-modal-sell');
+            const btnForge = document.getElementById('btn-modal-forge');
             
-            btnBuy.classList.remove('hidden');
-            btnBuy.textContent = `BUY (${formatMoney(card.currentPrice)})`;
+            const stock = marketStock[id] || 0;
+            
+            if (stock > 0) {
+                btnBuy.classList.remove('hidden');
+                btnBuy.textContent = `BUY (${formatMoney(card.currentPrice)}) - STOCK: ${stock}`;
+                btnBuy.disabled = false;
+                btnBuy.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-400');
+                btnBuy.classList.add('bg-accentGreen');
+            } else {
+                btnBuy.classList.remove('hidden');
+                btnBuy.textContent = `OUT OF STOCK`;
+                btnBuy.disabled = true;
+                btnBuy.classList.remove('bg-accentGreen');
+                btnBuy.classList.add('opacity-50', 'cursor-not-allowed', 'bg-gray-400');
+            }
             
             const qty = state.inventory[id] || 0;
             if(qty > 0) {
@@ -1263,19 +1466,52 @@
             } else {
                 btnSell.classList.add('hidden');
             }
+
+            // Show direct Forge option inside Modal if user has 3+ copies
+            if (btnForge) {
+                if (qty >= 3 && card.rarity !== 'voidTier') {
+                    btnForge.classList.remove('hidden');
+                    btnForge.onclick = () => {
+                        modal.classList.add('hidden');
+                        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                        const forgeNav = document.querySelector('.nav-item[data-target="screen-forge"]');
+                        if (forgeNav) forgeNav.classList.add('active');
+                        document.querySelectorAll('.screen-content').forEach(s => s.classList.add('hidden'));
+                        document.getElementById('screen-forge').classList.remove('hidden');
+                        renderForge();
+                        selectForgeCard(id);
+                    };
+                } else {
+                    btnForge.classList.add('hidden');
+                }
+            }
         };
 
         document.getElementById('btn-modal-buy').onclick = () => {
             const card = CARD_DB.find(c => c.id === activeTradeCardId);
+            
+            if (!marketStock[card.id] || marketStock[card.id] <= 0) {
+                notify('OUT OF STOCK IN MARKET!', 'error');
+                return;
+            }
+
             if(state.balance >= card.currentPrice) {
                 state.balance -= card.currentPrice;
                 state.inventory[card.id] = (state.inventory[card.id] || 0) + 1;
-                card.currentPrice *= 1.05; // Price goes up
+                card.currentPrice *= 1.05; 
+                
+                // Deduct market stock based on prompt request
+                marketStock[card.id]--;
+
                 notify(`Bought ${card.name}`, 'success');
-                handleCardClick(activeTradeCardId, 'market');
+                handleCardClick(activeTradeCardId, 'market'); // Refresh modal data
                 updateUI();
                 renderMarketGrid();
                 renderCollection();
+                
+                if (marketStock[card.id] <= 0) {
+                     document.getElementById('modal-trade').classList.add('hidden'); // Close modal if we just bought last copy
+                }
             } else {
                 notify('Insufficient Funds!', 'error');
             }
@@ -1285,14 +1521,19 @@
             const qty = state.inventory[activeTradeCardId] || 0;
             if(qty > 0) {
                 const card = CARD_DB.find(c => c.id === activeTradeCardId);
-                state.balance += card.currentPrice * 0.9; // 10% market fee
+                state.balance += card.currentPrice * 0.9; 
                 state.inventory[card.id]--;
-                card.currentPrice *= 0.95; // Price goes down
+                card.currentPrice *= 0.95; 
+                
+                // Player selling returns stock to global market (capped at max 4)
+                marketStock[card.id] = Math.min(4, (marketStock[card.id] || 0) + 1);
+                
                 notify(`Sold ${card.name}`, 'info');
                 handleCardClick(activeTradeCardId, 'market');
                 updateUI();
                 renderMarketGrid();
                 renderCollection();
+                renderForge();
             }
         };
 
@@ -1313,6 +1554,7 @@
                 
                 if(targetId === 'screen-market') renderMarketGrid();
                 if(targetId === 'screen-collection') renderCollection();
+                if(targetId === 'screen-forge') renderForge();
             });
         });
 
@@ -1336,7 +1578,6 @@
 
         document.getElementById('btn-change-leaderboard-name').onclick = document.getElementById('ui-avatar-container').onclick;
 
-        // Initialize UI Filters
         const populateFilters = () => {
             let rOpts = '<option value="all">ALL RARITIES</option>';
             Object.keys(RARITIES).forEach(k => rOpts += `<option value="${k}">${RARITIES[k].name}</option>`);
@@ -1374,7 +1615,6 @@
                 dummy.push({ name: `USER_${Math.floor(Math.random()*9999)}`, lvl: Math.floor(Math.random()*50)+1, nw: Math.random()*1000000 });
             }
             
-            // Calc player NW
             let playerNw = state.balance;
             Object.keys(state.inventory).forEach(id => {
                 if(state.inventory[id] > 0) {
@@ -1400,45 +1640,18 @@
         };
         setInterval(populateLeaderboard, 15000);
 
-        // Startup
+        refreshMarketStock(); // Initialize stock FIRST
         populateFilters();
         renderCrates();
         loadGame();
         populateLeaderboard();
         
-        // Attach re-render on filter change
         document.getElementById('market-filter-rarity').onchange = renderMarketGrid;
         document.getElementById('market-filter-category').onchange = renderMarketGrid;
         document.getElementById('collection-filter-rarity').onchange = renderCollection;
         document.getElementById('collection-filter-category').onchange = renderCollection;
         document.getElementById('collection-sort').onchange = renderCollection;
         
-        // Anti-hack visual pulse
-        setInterval(() => {
-            document.getElementById('anti-hack-badge').classList.toggle('bg-accentGreen');
-            document.getElementById('anti-hack-badge').classList.toggle('bg-white');
-        }, 1500);
-
-        // Daily Bonus
-        document.getElementById('btn-daily-bonus').onclick = function() {
-            if(this.disabled) return;
-            state.balance += 5000;
-            state.crystals += 10;
-            notify('DAILY SPIN CLAIMED: +$5,000 / +10 💎', 'success');
-            updateUI();
-            this.disabled = true;
-            this.innerHTML = '<i class="ph ph-check text-lg"></i> CLAIMED';
-            setTimeout(() => {
-                this.disabled = false;
-                this.innerHTML = '<i class="ph ph-spinner-gap text-lg"></i> DAILY SPIN';
-            }, 60000 * 5); // 5 min cooldown for demo
-        };
-
-        // Vault
-        document.getElementById('btn-claim-vault').onclick = function() {
-            notify('VAULT LOCKED. REQUIRES VIP PASS.', 'error');
-        };
-
     </script>
 </body>
 </html>
